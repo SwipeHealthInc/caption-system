@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwipeHealth Caption System</title>
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #0EA5E9;
+      --brand-dark: #0284C7;
+      --brand-light: #E0F2FE;
+      --dark: #0F172A;
+      --mid: #334155;
+      --muted: #64748B;
+      --light: #F1F5F9;
+      --border: #E2E8F0;
+      --white: #FFFFFF;
+      --success: #16A34A;
+      --error: #DC2626;
+      --warning: #D97706;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #F8FAFC;
+      color: var(--dark);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--dark);
+    }
+
+    .logo-dot {
+      width: 28px;
+      height: 28px;
+      background: var(--brand);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .header-badge {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--light);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* ── SECTION CARD ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── STEP INDICATOR ── */
+    .steps {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .step {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--white);
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .step.active {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      color: var(--brand-dark);
+    }
+
+    .step.done {
+      border-color: #BBF7D0;
+      background: #F0FDF4;
+      color: var(--success);
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step.active .step-num { background: var(--brand); color: white; }
+    .step.done .step-num { background: var(--success); color: white; }
+
+    /* ── BRAND SELECTOR ── */
+    .brand-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .brand-btn {
+      padding: 16px 20px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--white);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+
+    .brand-btn:hover {
+      border-color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    .brand-btn.selected {
+      border-color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    .brand-btn-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .brand-btn-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .brand-btn.selected .brand-btn-name { color: var(--brand-dark); }
+
+    /* ── INPUT MODE TABS ── */
+    .mode-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--light);
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+
+    .mode-tab {
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mode-tab.active {
+      background: var(--white);
+      color: var(--dark);
+      box-shadow: var(--shadow);
+    }
+
+    /* ── TEXTAREA ── */
+    .transcript-area {
+      width: 100%;
+      min-height: 180px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--dark);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .transcript-area:focus { border-color: var(--brand); }
+
+    .transcript-area::placeholder { color: #94A3B8; }
+
+    /* ── FILE UPLOAD ── */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--white);
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    .upload-zone.has-file {
+      border-color: var(--success);
+      background: #F0FDF4;
+    }
+
+    .upload-icon { font-size: 32px; margin-bottom: 10px; }
+
+    .upload-title {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .upload-sub { font-size: 13px; color: var(--muted); }
+
+    .upload-file-info {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    #file-input { display: none; }
+
+    /* ── GENERATE BUTTON ── */
+    .generate-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .generate-btn:hover:not(:disabled) { background: var(--brand-dark); }
+
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      margin-top: 16px;
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── RESULTS ── */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .results-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .results-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .captions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .caption-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .caption-card-header {
+      padding: 12px 16px;
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .caption-platform {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .caption-brand-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .badge-jake {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .badge-swipehealth {
+      background: var(--brand-light);
+      color: var(--brand-dark);
+    }
+
+    .caption-body {
+      padding: 16px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--mid);
+      flex: 1;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .caption-error {
+      padding: 16px;
+      font-size: 13px;
+      color: var(--error);
+      background: #FEF2F2;
+    }
+
+    .caption-card-footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .copy-btn {
+      flex: 1;
+      padding: 7px 12px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover { background: var(--brand-dark); }
+
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .char-count {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    /* ── LOADING SKELETON ── */
+    .caption-skeleton {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .skeleton-header {
+      height: 44px;
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skeleton-body {
+      padding: 16px;
+    }
+
+    .skeleton-line {
+      height: 13px;
+      background: var(--light);
+      border-radius: 4px;
+      margin-bottom: 10px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-line:last-child { width: 60%; }
+
+    @keyframes shimmer {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* ── API KEY SETUP ── */
+    .key-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .key-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .key-input-wrap {
+      position: relative;
+    }
+
+    .key-input {
+      width: 100%;
+      padding: 10px 40px 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      outline: none;
+      color: var(--dark);
+      transition: border-color 0.15s;
+    }
+
+    .key-input:focus { border-color: var(--brand); }
+
+    .key-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .key-status {
+      font-size: 11px;
+      margin-top: 4px;
+      height: 16px;
+    }
+
+    .key-status.valid { color: var(--success); }
+    .key-status.invalid { color: var(--error); }
+
+    /* ── NOTICE BANNER ── */
+    .notice {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .notice-info { background: var(--brand-light); color: var(--brand-dark); border: 1px solid #BAE6FD; }
+    .notice-warn { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-title { font-size: 18px; font-weight: 600; color: var(--mid); margin-bottom: 8px; }
+    .empty-sub { font-size: 14px; }
+
+    /* ── COPY ALL BUTTON ── */
+    .copy-all-btn {
+      padding: 9px 18px;
+      background: var(--white);
+      color: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-all-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+    /* ── MODEL SELECTOR ── */
+    .model-selector {
+      display: flex;
+      gap: 4px;
+      background: var(--light);
+      padding: 4px;
+      border-radius: 8px;
+      margin-top: 16px;
+      width: fit-content;
+    }
+
+    .model-tab {
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .model-tab.active {
+      background: var(--white);
+      color: var(--dark);
+      box-shadow: var(--shadow);
+    }
+
+    .badge-model {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+      background: var(--light);
+      color: var(--muted);
+      margin-left: 6px;
+    }
+
+    /* ── STEP OPTIONAL BADGE ── */
+    .step-optional {
+      font-size: 10px;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    .step.muted-step {
+      opacity: 0.75;
+    }
+
+    /* ── COLLAPSIBLE EXTRA CONTEXT (Step 3) ── */
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      padding: 4px 0;
+    }
+
+    .collapsible-header .chevron {
+      transition: transform 0.2s ease;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .collapsible-header.open .chevron {
+      transform: rotate(90deg);
+    }
+
+    .optional-badge {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--light);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .context-indicator {
+      font-size: 11px;
+      color: var(--brand);
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    .collapsible-body {
+      display: none;
+      margin-top: 12px;
+    }
+
+    .collapsible-body.open {
+      display: block;
+    }
+
+    .context-area {
+      width: 100%;
+      height: 100px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--dark);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .context-area:focus { border-color: var(--brand); }
+    .context-area::placeholder { color: #94A3B8; }
+
+    .context-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* ── PLATFORM TOGGLES (Step 4) ── */
+    .platform-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .platform-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .platform-row:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+
+    .platform-row.all-platforms-row {
+      grid-column: 1 / -1;
+      border-bottom: 2px solid var(--border);
+      background: var(--light);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .platform-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .platform-name.all-label {
+      font-weight: 700;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--border);
+      border-radius: 22px;
+      transition: 0.2s;
+    }
+
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--brand);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(18px);
+    }
+
+    .caption-count-line {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .caption-count-num {
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .brand-grid, .key-grid { grid-template-columns: 1fr; }
+      .captions-grid { grid-template-columns: 1fr; }
+      .steps { flex-direction: column; }
+      .main { padding: 16px; }
+      .platform-grid { grid-template-columns: 1fr; }
+      .platform-row:last-child { border-bottom: none; }
+      .platform-row:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-dot">S</div>
+    SwipeHealth Caption System
+  </div>
+  <span class="header-badge">v1.0 — Beta</span>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STEPS -->
+  <div class="steps" id="steps-indicator">
+    <div class="step active" id="step-1">
+      <div class="step-num">1</div>
+      Select Brand
+    </div>
+    <div class="step" id="step-2">
+      <div class="step-num">2</div>
+      Add Content
+    </div>
+    <div class="step muted-step" id="step-3">
+      <div class="step-num">3</div>
+      Context <span class="step-optional">(optional)</span>
+    </div>
+    <div class="step" id="step-4">
+      <div class="step-num">4</div>
+      Platforms
+    </div>
+    <div class="step" id="step-5">
+      <div class="step-num">5</div>
+      Generate
+    </div>
+    <div class="step" id="step-6">
+      <div class="step-num">6</div>
+      Copy &amp; Post
+    </div>
+  </div>
+
+  <!-- API KEYS -->
+  <div class="card" id="api-keys-card">
+    <div class="card-title">🔑 API Keys</div>
+    <div class="notice notice-info">
+      ℹ️ Keys are stored in your browser's session only — never sent anywhere except the respective APIs.
+    </div>
+    <div class="key-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+      <div class="key-field">
+        <label>Anthropic API Key (Claude)</label>
+        <div class="key-input-wrap">
+          <input type="password" class="key-input" id="anthropic-key" placeholder="sk-ant-..." autocomplete="off" />
+          <button class="key-toggle" onclick="toggleKeyVisibility('anthropic-key', this)">👁</button>
+        </div>
+        <div class="key-status" id="anthropic-key-status"></div>
+      </div>
+      <div class="key-field">
+        <label>OpenAI API Key (Whisper — for video upload)</label>
+        <div class="key-input-wrap">
+          <input type="password" class="key-input" id="openai-key" placeholder="sk-..." autocomplete="off" />
+          <button class="key-toggle" onclick="toggleKeyVisibility('openai-key', this)">👁</button>
+        </div>
+        <div class="key-status" id="openai-key-status">Optional — only needed if uploading video/audio</div>
+      </div>
+      <div class="key-field">
+        <label>Google API Key (Gemini)</label>
+        <div class="key-input-wrap">
+          <input type="password" class="key-input" id="gemini-key" placeholder="AIza..." autocomplete="off" />
+          <button class="key-toggle" onclick="toggleKeyVisibility('gemini-key', this)">👁</button>
+        </div>
+        <div class="key-status" id="gemini-key-status">Optional — only required if using Gemini</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Generation Model</label>
+      <div class="model-selector" id="model-selector">
+        <button class="model-tab active" data-model="claude" onclick="selectModel('claude')">Claude Sonnet 4</button>
+        <button class="model-tab" data-model="gemini" onclick="selectModel('gemini')">Gemini 1.5 Pro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRAND SELECTOR -->
+  <div class="card">
+    <div class="card-title">Step 1 — Select Brand</div>
+    <div class="brand-grid">
+      <button class="brand-btn" id="btn-jake" onclick="selectBrand('jake')">
+        <div class="brand-btn-name">👤 Jake (Personal Brand)</div>
+        <div class="brand-btn-desc">TikTok, LinkedIn, Instagram, X, Threads, YouTube Shorts</div>
+      </button>
+      <button class="brand-btn" id="btn-swipehealth" onclick="selectBrand('swipehealth')">
+        <div class="brand-btn-name">🏃 SwipeHealth (Brand)</div>
+        <div class="brand-btn-desc">TikTok, LinkedIn, Instagram, Facebook, X, Threads, YouTube Shorts</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT INPUT -->
+  <div class="card">
+    <div class="card-title">Step 2 — Add Your Content</div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-transcript" onclick="switchMode('transcript')">
+        📝 Paste Transcript
+      </button>
+      <button class="mode-tab" id="tab-upload" onclick="switchMode('upload')">
+        🎥 Upload Video / Audio
+      </button>
+    </div>
+
+    <!-- TRANSCRIPT INPUT -->
+    <div id="mode-transcript">
+      <textarea
+        class="transcript-area"
+        id="transcript-input"
+        placeholder="Paste your script or transcript here...
+
+Example: 'So I've been thinking about this a lot lately. Most people who wear a fitness tracker — Apple Watch, Fitbit, Garmin — they look at their sleep score every morning and then... do nothing with it. The app tells you how you slept but it never tells you what to actually do about it. That's the whole problem we're solving with SwipeHealth...'"
+      ></textarea>
+    </div>
+
+    <!-- FILE UPLOAD INPUT -->
+    <div id="mode-upload" style="display:none;">
+      <div class="notice notice-warn">
+        ⚠️ Requires OpenAI API key (Whisper). File will be transcribed, cleaned, then used to generate captions.
+        <span style="display:block;margin-top:4px;font-size:11px;opacity:0.8;">Video transcription always uses OpenAI Whisper regardless of selected generation model.</span>
+      </div>
+      <div
+        class="upload-zone"
+        id="upload-zone"
+        onclick="document.getElementById('file-input').click()"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)"
+      >
+        <div class="upload-icon">🎬</div>
+        <div class="upload-title">Click to upload or drag & drop</div>
+        <div class="upload-sub">MP4, MOV, MP3, M4A, WAV, WebM · Max 25MB</div>
+        <div class="upload-file-info" id="file-info" style="display:none;"></div>
+      </div>
+      <input type="file" id="file-input" accept="video/*,audio/*,.mp3,.m4a,.wav,.webm" onchange="handleFileSelect(event)" />
+
+      <!-- Transcription preview -->
+      <div id="transcript-preview" style="display:none; margin-top:16px;">
+        <div class="card-title" style="margin-bottom:8px;">Transcribed Text (editable)</div>
+        <textarea class="transcript-area" id="transcript-preview-text" style="min-height:120px;"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STEP 3 — EXTRA CONTEXT (Optional) -->
+  <div class="card" id="extra-context-card">
+    <div class="collapsible-header" id="context-header" onclick="toggleExtraContext()">
+      <span class="chevron">&#9654;</span>
+      <div class="card-title" style="margin-bottom:0;">Step 3 — Extra Context</div>
+      <span class="optional-badge">Optional</span>
+      <span class="context-indicator" id="context-indicator" style="display:none;">1 note added</span>
+    </div>
+    <div class="collapsible-body" id="context-body">
+      <label class="context-label">Additional instructions for this run</label>
+      <textarea
+        class="context-area"
+        id="extra-context-input"
+        placeholder="Add anything that would help generate better captions. Examples: the target audience for this specific post, the tone you want (more casual / more authoritative), a specific hook you want used, a CTA you want included, any context the transcript doesn't cover..."
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 4 — SELECT PLATFORMS -->
+  <div class="card" id="platform-card">
+    <div class="card-title">Step 4 — Select Platforms</div>
+    <div class="platform-grid" id="platform-grid">
+      <!-- All Platforms toggle -->
+      <div class="platform-row all-platforms-row">
+        <span class="platform-name all-label">All Platforms</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-all" checked onchange="toggleAllPlatforms(this.checked)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- Individual platforms -->
+      <div class="platform-row" id="row-tiktok">
+        <span class="platform-name">TikTok</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="tiktok" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="platform-row" id="row-x">
+        <span class="platform-name">X (Twitter)</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="x" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="platform-row" id="row-linkedin">
+        <span class="platform-name">LinkedIn</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="linkedin" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="platform-row" id="row-threads">
+        <span class="platform-name">Threads</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="threads" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="platform-row" id="row-instagram">
+        <span class="platform-name">Instagram</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="instagram" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="platform-row" id="row-youtube">
+        <span class="platform-name">YouTube Shorts</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="youtube" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="platform-row" id="row-facebook" style="display:none;">
+        <span class="platform-name">Facebook</span>
+        <label class="toggle">
+          <input type="checkbox" data-platform="facebook" checked onchange="onPlatformToggle()" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="caption-count-line" id="caption-count-line">
+      Generating <span class="caption-count-num" id="caption-count">0</span> captions
+    </div>
+  </div>
+
+  <!-- STEP 5 — GENERATE -->
+  <div class="card" id="generate-card">
+    <div class="card-title">Step 5 — Generate</div>
+    <button class="generate-btn" id="generate-btn" onclick="handleGenerate()" disabled>
+      ✨ Generate All Captions
+    </button>
+    <div class="progress-wrap" id="progress-wrap" style="display:none;">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="progress-text" id="progress-text">Starting...</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 — RESULTS -->
+  <div id="results-section" style="display:none;">
+    <div class="results-header">
+      <div>
+        <div class="results-title" id="results-title">Step 6 — Copy &amp; Post</div>
+        <div class="results-meta" id="results-meta"></div>
+      </div>
+      <button class="copy-all-btn" onclick="copyAll()">Copy All as Text</button>
+    </div>
+    <div class="captions-grid" id="captions-grid"></div>
+  </div>
+
+  <!-- EMPTY STATE (initial) -->
+  <div class="empty-state" id="empty-state">
+    <div class="empty-icon">✍️</div>
+    <div class="empty-title">Ready to generate</div>
+    <div class="empty-sub">Select a brand, add your content, and hit Generate.</div>
+  </div>
+
+</main>
+
+<script type="module">
+  // ── STATE ──
+  let state = {
+    brand: null,
+    transcript: "",
+    inputMode: "transcript",
+    uploadedFile: null,
+    isGenerating: false,
+    results: [],
+    totalPlatforms: 0,
+    model: "claude",
+    extraContext: "",
+    enabledPlatforms: { tiktok: true, linkedin: true, instagram: true, facebook: true, x: true, threads: true, youtube: true }
+  };
+
+  // Map platform toggle keys to PLATFORMS array id prefixes
+  const PLATFORM_KEY_MAP = {
+    tiktok: "tiktok",
+    linkedin: "linkedin",
+    instagram: "instagram",
+    facebook: "facebook",
+    x: "x",
+    threads: "threads",
+    youtube: "youtube"
+  };
+
+  // ── PLATFORM CONFIG ──
+  // Inline platform data (mirrors platforms.js — kept inline to avoid module import issues in file:// context)
+  const PLATFORMS = [
+    { id:"tiktok_jake", brand:"jake", displayName:"TikTok — Jake",
+      platformContext:`PLATFORM: TikTok — Jake personal brand. Discovery platform — most viewers don't follow Jake yet.
+
+LENGTH: 100-150 characters hard target. Get in, get out. TikTok users do not read long captions.
+STRUCTURE: [One punchy line that reinforces or adds intrigue to the video] / [Optional: 1 short follow-up] / [3-5 hashtags at end]
+TONE: Casual, California-warm, scroll-native. Fragments are fine. Short sentences. Founder telling his story. Never corporate, never rehearsed.
+HASHTAGS: 3-5 at end only. Mix: 1 broad (#fitness), 1 niche (#wearabletech or #workoutapp), 1 trend if relevant. Never mid-caption.
+CTA: Soft only. "Save this", "Drop a comment", question CTA. No hard sales.
+EMOJIS: 1-3 max. Only if they add meaning. Never decorative.
+DO: Relatable real-life scenarios. "POV:" format. Specific numbers. Behind-the-scenes founder energy.
+NEVER: Long paragraphs. Multiple CTAs. Em-dashes. Restate what the video already shows. Profanity.
+NATIVE CONTRACT: This caption should read like a text message sent to a friend. If someone read it aloud, it should sound completely natural. Test: would a 25-year-old text this to a friend? If not, rewrite it.
+CORPUS INTELLIGENCE: The highest-performing TikTok captions add EMOTIONAL CONTEXT the video can't show alone (2.8M likes on results reveals, 264K on relatable confessions). The caption should read like a single text message to a friend. Use the open-loop technique: end with "..." or an emoji that implies "watch to find out." Build toward a named community hashtag (#SwipeHealthChallenge or equivalent) as the most powerful TikTok-specific engagement mechanic. Jake's best TikTok format: founder confession ("7 months, no salary, here's what that actually feels like") or results reveal.` },
+
+    { id:"tiktok_swipehealth", brand:"swipehealth", displayName:"TikTok — SwipeHealth",
+      platformContext:`PLATFORM: TikTok — SwipeHealth brand. Discovery platform — most viewers don't know SwipeHealth yet.
+
+LENGTH: 100-150 characters hard target. Short, punchy, benefit-led.
+STRUCTURE: [One scenario-driven or benefit line] / [Optional: 1 follow-up sentence] / [3-5 hashtags at end]
+TONE: Casual, approachable, relatable fitness scenario. 5th-8th grade reading level. Never corporate. Never aggressive.
+HASHTAGS: 3-5 at end. Mix: #WorkoutApp #WearableFitness #FitnessTracker + 1-2 niche.
+CTA: Soft. "Save this", "Drop a comment", question CTA. No hard sales.
+EMOJIS: 1-3. Purposeful, not decorative.
+HOOK: Lead with user's problem or a specific scenario. NEVER start with "SwipeHealth" or brand name.
+DO: "You slept 4 hours. Your app still wants leg day." Scenario-driven. Specific. Relatable.
+PHASE 2 REDIRECT: If transcript describes wearable signal adaptation (overnight data adjusting plans), focus caption on the DATA GAP problem instead. "Your watch tracks everything. Nothing tells you what to do with it." Frame SwipeHealth as the solution without specifying the mechanism.
+NEVER: Phase 2 features (nutrition, wearable signal adaptation — beta is exercise only). Shame/fear language. Medical claims. Em-dashes. Multiple CTAs.
+NATIVE CONTRACT: This caption should read like a text message sent to a friend. If someone read it aloud, it should sound completely natural. Test: would a 25-year-old text this to a friend? If not, rewrite it.
+CORPUS INTELLIGENCE: TikTok's top posts combine aspiration with permission ("lost 21 pounds... ate normally at family events"). The confession format ("I finally stopped feeling guilty about short workouts") drives massive engagement because it names an emotion the viewer has but hasn't said aloud. Build toward a named community hashtag (#SwipeHealthChallenge or equivalent) as the most powerful TikTok-specific engagement mechanic. Best SwipeHealth TikTok format: empathy confession hooks and "first week on SwipeHealth" results reveals.` },
+
+    { id:"linkedin_jake", brand:"jake", displayName:"LinkedIn — Jake",
+      platformContext:`PLATFORM: LinkedIn — Jake personal brand. Professional network, intentional consumption. Users slow down here.
+
+LENGTH: 900-1,800 characters optimal. Long enough to deliver value, short enough to finish.
+CRITICAL HOOK RULE: First 2-3 lines appear before "see more" cutoff. These lines ARE the caption. Write them last. Every word earns its place. Counterintuitive statement, specific number + problem, or personal confession. Zero filler warm-up lines.
+LINE BREAK RULE (NON-NEGOTIABLE): Every 2-3 sentences = new paragraph with a blank line between. Single-sentence paragraphs for key insights work well. NEVER 5+ sentences in a row without a break. Dense blocks get skipped entirely.
+STRUCTURE: [Hook 1-2 lines] / [blank] / [Body short paragraphs with blank lines between] / [blank] / [Lesson or payoff] / [blank] / [One question CTA] / [blank] / [3-5 niche hashtags]
+TONE: Professional but human. Founder journey, contrarian takes with evidence, building in public, lessons. Credibility markers: Forbes 30u30, Inc 5000, UT Austin faculty, NASM certified. Never brag without context. Never corporate press release energy.
+HASHTAGS: 3-5 niche only at very end. Use: #HealthTech #WearableTech #Founder #FitnessTech #SwipeHealth. NEVER generic (#motivation #fitness). NEVER mid-caption.
+CTA: One specific question that invites a real opinion. Or soft share CTA. NEVER "let me know your thoughts." NEVER "like and share."
+EMOJIS: 0-2 max. Optional. Never a string of emojis.
+NEVER: Em-dashes. Delve/unlock/game-changing/revolutionary/seamlessly. Dense blocks. Multiple CTAs. All-product pitch. Generic fitness advice. Profanity.
+NATIVE CONTRACT: This caption should feel like something a sharp founder would write between meetings, not a press release or thought leadership performance. Test: does it sound like a real human had a real thought? If it sounds "crafted", strip it back.
+PERSONAL BRAND ENERGY: Jake's LinkedIn should feel like a founder who had a genuine thought and wrote it down. NOT like a content creator who sat down to write a LinkedIn post. The difference: genuine thought = starts mid-observation, uses incomplete logic on purpose, leaves space for the reader to finish the thought. Content creator = perfect structure, tidy conclusion, everything wrapped up. Jake's posts should feel slightly unfinished, like he's thinking out loud and the reader gets to participate in the conclusion.
+STRUCTURAL SHIFT: Reduce reliance on the clean 3-part structure (hook/body/CTA). Instead, occasionally use: raw observation > unexpected implication > open question. Or: specific thing that happened > what it made me realize > leave it there. No tidy wrap-up. No "progress over perfection" sign-off every time. Vary the endings.
+AUDIENCE AWARENESS: Jake's LinkedIn audience is in marketing, advertising, media, and entrepreneurship. These are professionally sophisticated people who can smell a template, have seen every LinkedIn trick, and respect directness and original thought above all else. Write to them as peers, not as an audience. They know what a funnel is. They know what CAC is. They don't need jargon explained. Skip the 101 content and go straight to the non-obvious observation.
+CORPUS INTELLIGENCE: LinkedIn intelligence is covered in the main Caption Playbook. Key reminder: definitive verdicts outperform hedged opinions on every platform. "Static workout plans are a design failure" outperforms "I think static plans might not work for everyone." State the claim. Let the comments debate.` },
+
+    { id:"linkedin_swipehealth", brand:"swipehealth", displayName:"LinkedIn — SwipeHealth",
+      platformContext:`PLATFORM: LinkedIn — SwipeHealth brand. Credibility-forward, insight-driven, data-backed.
+
+LENGTH: 900-1,800 characters optimal.
+CRITICAL HOOK RULE: First 2-3 lines appear before "see more" cutoff. Lead with a market problem, data point, or counterintuitive observation. Zero filler. "150 million Americans wear health trackers. Almost none know what to do with the data." is the energy.
+LINE BREAK RULE (NON-NEGOTIABLE): Every 2-3 sentences = new paragraph with blank line. Single-sentence paragraphs for key insights. NEVER 5+ sentences without a break.
+STRUCTURE: [Hook — market data or problem] / [blank] / [Problem expansion] / [blank] / [What SwipeHealth does differently — specific, not hype] / [blank] / [Implication or lesson] / [blank] / [One CTA question] / [blank] / [3-5 hashtags]
+TONE: Confident, clear, credible. Sounds like a smart company talking, not a press release. Data-backed observation over self-promotion. Show product through specific scenarios.
+BETA RULE: NEVER claim Phase 2 features. Exercise-only beta. No nutrition, no wearable signal adaptation, no specific wearable API integrations.
+HASHTAGS: 3-5 niche at end only. #HealthTech #WearableFitness #FitnessApp #AdaptiveTraining #SwipeHealth.
+CTA: One question inviting specific opinion or experience. NEVER generic engagement begs.
+EMOJIS: 0-2 max.
+NEVER: Em-dashes. Phase 2 claims. Medical claims. Shame language. Multiple CTAs. Dense paragraphs. Brand name as opening word.
+NATIVE CONTRACT: This caption should feel like something a sharp founder would write between meetings, not a press release or thought leadership performance. Test: does it sound like a real human had a real thought? If it sounds "crafted", strip it back.
+CORPUS INTELLIGENCE: LinkedIn intelligence is covered in the main Caption Playbook. Key reminder: specificity beats vagueness everywhere. "68% of wearable owners abandon their companion app in 6 months" beats "most people stop using fitness apps." Community identity beats product features. Position SwipeHealth as a movement ("built for everyone else") not just a product.` },
+
+    { id:"instagram_jake", brand:"jake", displayName:"Instagram — Jake",
+      platformContext:`PLATFORM: Instagram — Jake personal brand. Visual-first. Caption supports the visual.
+
+LENGTH: 150-300 chars for Reels. 800-1,200 for value-dense carousel posts.
+HOOK RULE: Instagram shows first 125 characters before "more" on mobile. First line = standalone hook. Best: curiosity gap, relatable moment, bold claim, specific number.
+NEVER START WITH "I" — weak opener and algorithm-unfriendly. Lead with observation, scenario, or number.
+STRUCTURE (Reels): [1 punchy line that adds to video] / [Optional: 1 follow-up] / [3-5 hashtags]
+STRUCTURE (Carousel): [Hook] / [blank] / [Body with white space] / [Lesson] / [CTA] / [blank line] / [Hashtags]
+TONE: Warm, personal, behind-the-scenes founder energy. More emotional than LinkedIn. Real moments. Aspirational but grounded.
+HASHTAGS: 5-10 at end after a line break. Mix: 2-3 niche, 2-3 mid-size, 1 brand. Never mid-caption. Never 30+.
+CTA: "Save this for your next workout" / "Tag someone who needs this" / Question to drive comments.
+EMOJIS: 2-5. Use to break up text, add personality, emphasize key points. Never excessive chains.
+PERSONALITY CHECK: Jake's Instagram should feel like a founder talking to a friend, not a founder pitching a product. If the output reads like an ad, rewrite it. Reference a specific moment, feeling, or observation from the transcript before introducing the product angle. The personal hook comes first. Show the human before the business.
+OPENER VARIETY: Avoid generic personal frames like "Had a conversation recently" or "I was thinking about this." Prefer specific moments, direct observations, or the counterintuitive claim itself. If using a personal frame, make it specific enough to sound like it actually happened to Jake. Good: "Someone asked me yesterday why their fitness app ignores their schedule." Bad: "Had a conversation recently about fitness apps."
+VISUAL HOOK RULE: The first frame of the video is the real hook, not the caption text. If it's a Reel, the caption is secondary. Consider the "wrong vs right" split-screen format for product comparison content. Counter-narrative talking-head Reels ("Nobody building a fitness app talks about this") drive profile visits.
+NATIVE CONTRACT: The caption is decoration on the visual. If the caption is doing the heavy lifting, the video is failing. Test: does this caption add something the video CAN'T show? If not, cut it in half.
+CORPUS INTELLIGENCE: Instagram at scale is almost entirely visual-first. The top 3 posts (215M, 96M, 32M views) have near-zero caption text because the hook is in the first frame. For talking-head Reels, the counter-narrative format works best: bold counter-claim + simple reframe + curiosity CTA ("Let me show you how"). Jake's best IG format: confession + results ("I stopped tracking macros and started tracking wins").
+NEVER: Em-dashes. Start with "I". Long blocks without breaks. All-product zero-story. Fitness shaming. Generic motivational quotes.` },
+
+    { id:"instagram_swipehealth", brand:"swipehealth", displayName:"Instagram — SwipeHealth",
+      platformContext:`PLATFORM: Instagram — SwipeHealth brand. Visual-emotional. Caption supports the visual.
+
+LENGTH: 150-300 chars for Reels. 800-1,200 for carousels.
+HOOK RULE: First 125 characters visible before "more." Lead with user's reality, not brand name. NEVER start with "SwipeHealth" or any brand name.
+Best hooks: relatable fitness scenario, specific stat, curiosity gap.
+STRUCTURE (Reels): [Scenario-driven punchy line] / [Optional follow-up] / [3-5 hashtags]
+STRUCTURE (Carousel): [Hook] / [blank] / [Short paragraphs with white space] / [CTA] / [blank] / [Hashtags]
+TONE: Clean, benefit-driven, aspirational but real. Show product through specific user scenarios, not feature lists.
+HASHTAGS: 5-10 at end after line break. Mix: #WearableFitness #AdaptiveWorkout #FitnessApp #HealthTech #SwipeHealth. Never mid-caption.
+CTA: "Save this" / "Tag someone who needs this" / Question. One CTA maximum.
+EMOJIS: 2-5. Clean, not loud. SwipeHealth keeps it more restrained than personal brand content.
+BETA RULE: NEVER Phase 2 features. Exercise-only beta. If transcript describes wearable signal adaptation (overnight data adjusting plans), redirect: focus on the DATA GAP problem (people have data but no action path) and what SwipeHealth does today (personalized programming based on your inputs). Never medical claims.
+PHASE 2 TRAP: Never connect "your watch/wearable data" directly to "SwipeHealth adjusts your plan" as if this works today. The wearable adaptation is Phase 2. Instead frame the problem (data sits unused) and the beta solution (personalized programming that fits your life) as separate things. Wrong: "Your watch tracked your sleep. SwipeHealth changes that." Right: "Your watch tracks everything. Nothing tells you what to do with it. SwipeHealth starts with programming that actually fits your life."
+VISUAL HOOK RULE: The first frame of the video is the real hook, not the caption text. If it's a Reel, the caption is secondary. Consider the "wrong vs right" split-screen format for product comparison content: "Same workout every day (wrong) vs plan that adapts to your life (right)."
+NATIVE CONTRACT: The caption is decoration on the visual. If the caption is doing the heavy lifting, the video is failing. Test: does this caption add something the video CAN'T show? If not, cut it in half.
+CORPUS INTELLIGENCE: The most viral IG fitness content uses deliberate ambiguity to drive comments (naming a method but not explaining it forces viewers to ask). The "You DON'T need X to get Y" counter-narrative format (Ladder, 12.5M views) provides emotional relief for overwhelmed viewers and pulls them to the profile. SwipeHealth's best IG format: "wrong vs right" visual comparing static plans to adaptive programming, or mystery-method hooks ("The reason 68% of people quit fitness apps").
+NEVER: Em-dashes. Brand name as opening word. Dense text blocks. Phase 2 claims. Shame/fear language. Multiple CTAs.` },
+
+    { id:"facebook_swipehealth", brand:"swipehealth", displayName:"Facebook — SwipeHealth",
+      platformContext:`PLATFORM: Facebook — SwipeHealth brand only. Audience skews 35-55. Organic reach. Community over broadcasting.
+
+LENGTH: 150-300 words optimal for value posts. 40-80 words for link posts. Shorter than you think — Facebook users skim.
+HOOK RULE: Facebook truncates at ~400 characters before "See More." Hook must earn the click. Works: relatable scenario, specific stat, direct question to reader. Fails: brand name or product pitch as opener.
+STRUCTURE: [Hook — relatable, direct, specific] / [blank] / [2-3 short paragraphs of context] / [blank] / [CTA — community question, share prompt, or link] / [0-3 hashtags optional]
+TONE: Warmest, most conversational of all platforms. Feels like a community post, not a brand announcement. SwipeHealth sounds like a helpful resource, not a company. No polish energy here. Real, genuine, warm.
+HASHTAGS: 0-3 max. Facebook is not a hashtag platform. If used: #SwipeHealth #HealthTech #FitnessApp. Often none at all is better.
+CTA: Community-oriented: "Have you tried anything like this?" / Share-driven: "Share this with someone who needs it." / "Read more at [link]." Avoid aggressive CTAs.
+EMOJIS: 1-3 max. Conservative. This audience skews older. Use to add warmth, not energy.
+WHAT WORKS: Relatable real-life moments. Community questions. Educational tips framed as helpful. Real scenario storytelling.
+BETA RULE: NEVER Phase 2 features. Never medical claims.
+COMMUNITY VALUES RULE: Facebook communities mobilize when brand values are violated. Never imply a correct body type, pace, or fitness standard. One post with body/pace standards = comment section turns. SwipeHealth's anti-shame positioning must be consistent on every Facebook post, no exceptions. The Peloton cautionary tale: their inclusivity promise was deeply held by their community, and one perceived violation activated hundreds of critical comments.
+NATIVE CONTRACT: This audience has seen every brand trick. Test: does this sound like a helpful community member sharing something useful? Or does it sound like a company? Kill anything that sounds like a company.
+CORPUS INTELLIGENCE: Facebook's strongest format is community opinion solicitation ("Anyone using a fitness app AND a wearable? What's actually working for you?") which drives 100-300+ comments because there's no wrong answer. Shared events with specific dates ("SwipeHealth beta launches April 9") create urgency without fake scarcity. The "real person, real life" angle is completely unoccupied in the fitness/wearable niche on Facebook, and SwipeHealth owns that positioning.
+NEVER: TikTok-style brevity (too cryptic). Heavy fitness culture language. Posts that feel like ads. Em-dashes. Multiple CTAs. Shame language. Body type or pace standards.` },
+
+    { id:"x_jake", brand:"jake", displayName:"X — Jake",
+      platformContext:`PLATFORM: X (Twitter) — Jake personal brand. Most text-native platform. Rewards concision, wit, strong opinions.
+
+LENGTH: 280 characters HARD LIMIT. Every word earns its place.
+HOOK RULE: The whole tweet IS the hook. Best structures: statement + punchline / observation + implication / counterintuitive fact / question + answer. The entire 280 chars has to land immediately.
+NEVER start with "I", "So", or "Well" — weak openers. Lead with the sharpest part of the thought.
+STRUCTURE: [Full thought in 280 chars or less. No hashtags unless joining a trending topic.]
+TONE: Sharp, opinionated, confident. Dry humor and understatement work well. Jake is the smartest person at the table who doesn't need to show off. Founder building-in-public energy. Wit is welcome.
+HASHTAGS: 0-1 only. Rarely add value on X unless joining a trending conversation.
+CTA: Implicit CTAs work best — a great tweet gets replies without asking. If explicit: use sparingly.
+EMOJIS: 0-2. X leans text-native. Emojis for clarity or emphasis only, never decoration.
+NUMBERED FRAMEWORK PATTERN: When the transcript contains specific numbers or protocols, format as a numbered list with exact thresholds. Example: "1) stat + what it means, 2) stat + implication." Specificity at this level is what makes X posts bookmarkable. Bryan Johnson's "45 bpm = perfect sleep, 50 bpm = 20% worse" format drives 10K-20K likes because exact numbers invite debate.
+NATIVE CONTRACT: Every word competes with a thousand other words for 0.3 seconds of attention. Test: read it in one breath. If you need a second breath, it's too long.
+IDEOLOGY LAYER: X is where Jake's actual worldview lives. Not SwipeHealth content. Not founder journey content. Jake's actual beliefs about how the world works. Pull from these core ideologies when the transcript connects to them:
+- Everything operates on a spectrum, not in binaries. Jake never sees the world as black and white. He sees weighted grades against context.
+- Consistency beats talent. Every time. Go to the gym every day for 3 months and you're the gym person. Practice is the only cure for imposter syndrome.
+- Empathy drives persuasion. Not manipulation. Genuinely thinking about how someone will receive something before you say it.
+- Most people live in the middle. The fitness industry (and most industries) are built for extremes. Real people want the middle.
+- C's get degrees but C's get you fired. Average output is not acceptable.
+- Mission over money. He's drained his savings to build something he believes in. That's not marketing. That's daily reality.
+- Building in public is an ethical stance. If you're building for the mission, you have nothing to hide.
+When the transcript connects to any of these ideologies, surface it explicitly. Don't just caption the transcript. Find the ideology underneath it and caption that.
+FORMAT: Jake's X posts should feel like fragments of a longer thought he had in the shower. Conviction without ceremony. No setup, no landing. Just the sharpest possible version of one idea.
+CORPUS INTELLIGENCE: X is the most credibility-stratified platform. Conviction + specificity wins above all. Definitive verdicts ("Static plans are a design failure") outperform hedged opinions ("I think plans could be better"). The "I did X for Y months" credibility anchor works even without massive following because extreme commitment signals authority. Jake's best X formats: conviction post, career-pivot anchor ("7 months without a paycheck"), and hot takes backed by reasoning.
+NEVER: Em-dashes. Corporate announcements. Long blocks in a single tweet. Overly emotional content (save for LinkedIn). Hashtag stuffing. Profanity.` },
+
+    { id:"x_swipehealth", brand:"swipehealth", displayName:"X — SwipeHealth",
+      platformContext:`PLATFORM: X (Twitter) — SwipeHealth brand. Text-native. Rewards specificity and counterintuitive takes.
+
+LENGTH: 280 characters HARD LIMIT.
+HOOK RULE: The whole tweet IS the hook. Best: counterintuitive industry observation with a specific number. "68% of wearable owners quit their companion app in 6 months. Not because they stopped caring. Because the app never told them what to DO."
+NEVER start with "SwipeHealth" or any brand name.
+STRUCTURE: [Full thought in 280 chars. No hashtags unless trending.]
+TONE: Product insights, market observations, industry data points. Confident. Never hype. Sounds like a credible company with opinions.
+HASHTAGS: 0-1 only.
+EMOJIS: 0-2 max.
+BETA RULE: NEVER Phase 2 claims. Never medical claims. If transcript describes wearable signal adaptation, redirect to: (1) the data gap problem, (2) what beta does today (personalized programming based on your inputs, $22.99/month), (3) optional tease "wearable integration coming later this year."
+PHASE 2 TRAP: When the transcript describes wearable data adjusting the morning plan, DO NOT frame SwipeHealth as fixing that directly in beta. Instead: name the broader problem (data without action), state what beta solves (personalized programming that adapts to your goals and schedule), and optionally tease Phase 2 with "that full wearable loop is coming." Wrong: "Your tracker knows you slept badly. SwipeHealth exists to fix that." Right: "150M people wear a tracker. Almost none have a plan that adapts to their life. SwipeHealth starts there."
+BRAND MENTION RULE: SwipeHealth should appear occasionally when it fits naturally within 280 chars. If there's room after the problem statement, close with the brand: "That's the whole design problem. SwipeHealth is built for everyone else." Don't force it if the tweet is already at the limit, but when the problem framing is concise enough, the brand close adds value.
+NUMBERED FRAMEWORK PATTERN: When the transcript contains specific numbers or protocols, format as a numbered list with exact thresholds. Example: "1) 68% quit in 6 months, 2) 3-4 apps that don't talk to each other, 3) zero action from the data." Specificity at this level is what makes X posts bookmarkable and shareable.
+NATIVE CONTRACT: Every word competes with a thousand other words for 0.3 seconds of attention. Test: read it in one breath. If you need a second breath, it's too long.
+CORPUS INTELLIGENCE: X rewards conviction + specificity above all else. The strongest format for SwipeHealth is the data stat post ("68% of wearable owners abandon their companion app. Not laziness. Design failure."). The product hot take format also works: bold declarative claim + crisp reasons. Definitive verdicts without hedging drive 3-8x more engagement than qualified opinions. SwipeHealth's best X voice: credible company with opinions, not a brand with announcements.
+NEVER: Em-dashes. Corporate announcements. Hashtag stuffing. Phase 2 feature claims. Multiple CTAs.` },
+
+    { id:"threads_jake", brand:"jake", displayName:"Threads — Jake",
+      platformContext:`PLATFORM: Threads — Jake personal brand. Instagram's text platform. Warmer and less confrontational than X. Authenticity over polish.
+
+LENGTH: 150-300 characters optimal. Hard limit 500 per post.
+HOOK: Softer than X. Works: relatable observation, casual question, behind-the-scenes thought. "Talking to a friend" energy, not "hot take" energy.
+STRUCTURE: [One clear conversational thought under 500 chars] / [Optional: 1 follow-up sentence or question] / [No hashtags]
+TONE: Most conversational of all platforms. Feels like texting a group of people who care about what you're building. Behind-the-scenes, thinking out loud, unfiltered. Building in public. Genuine Jake.
+HASHTAGS: ZERO. Threads does not use hashtags the way other platforms do.
+CTA: Natural questions: "What do you think?" / "Agree or disagree?" Low-pressure. Replies and quotes drive reach more than explicit CTAs.
+EMOJIS: 1-3 casual emojis. Matches conversational energy.
+NATIVE TONE: Lowercase casual outperforms proper capitalization on Threads. "seriously, get back in the gym" outperforms "Seriously, Get Back In The Gym." Match the platform's native register. Jake's Threads voice should feel like texting, not posting.
+NATIVE CONTRACT: This is a group chat, not a broadcast. Test: would this feel weird coming from a friend? Then it's too formal. Would a friend actually say this? Then it's right.
+IDEOLOGY LAYER: Threads is where Jake's actual worldview lives in its most casual form. Pull from these core ideologies when the transcript connects:
+- Everything is a spectrum, not black and white. Weighted grades against context.
+- Consistency beats talent. Go every day for 3 months and you're the gym person.
+- Empathy drives persuasion. Think about how someone will receive it before you say it.
+- Most people live in the middle. Real people want the middle, not the extreme.
+- Mission over money. Drained savings to build something that matters. Not a marketing line.
+- Building in public is ethical. Nothing to hide when the mission is real.
+When the transcript connects to any of these, surface it. Don't just caption the transcript. Find the ideology underneath and caption that.
+FORMAT: Jake's Threads posts should feel like voice notes transcribed. Lowercase. Slightly imperfect. Like he typed it walking between meetings. The ideology comes through in what he chooses to say, not how polished it sounds.
+CORPUS INTELLIGENCE: Threads rewards opinions stated as facts, not questions. The commanding peer statement format (Gymshark: "seriously, get back in the gym") works because it feels like a text from a friend, not a brand. Personal experiment verdicts with clear opinions ("tested 4 fitness apps. here's what's actually different.") outperform open-ended questions. Build-in-public updates in lowercase casual tone are Jake's strongest Threads format.
+NEVER: Em-dashes. Over-polished brand content. Long-form essays. Aggressive sales. Heavy data posts (use LinkedIn for that). Multiple CTAs. Profanity.` },
+
+    { id:"threads_swipehealth", brand:"swipehealth", displayName:"Threads — SwipeHealth",
+      platformContext:`PLATFORM: Threads — SwipeHealth brand. Lighter brand presence. Let Jake's voice carry the platform. Community-feel over broadcasting.
+
+LENGTH: 150-300 characters optimal. Hard limit 500.
+HOOK: Soft, conversational, relatable fitness observation. "Casual community post" energy. NEVER start with "SwipeHealth" or brand name.
+STRUCTURE: [One casual, relatable thought] / [Optional follow-up] / [No hashtags]
+TONE: Warmest expression of SwipeHealth voice. Feels like someone who genuinely cares about fitness talking to people who do too. Not a brand announcement — a real thought.
+HASHTAGS: ZERO.
+CTA: Natural low-pressure question. "Have you noticed this?" / "What's worked for you?"
+EMOJIS: 1-3. Casual.
+BETA RULE: NEVER Phase 2 features. Never medical claims.
+NATIVE TONE: Lowercase casual outperforms proper capitalization on Threads. "honestly, your fitness app doesn't know anything about your actual life" outperforms "Honestly, Your Fitness App Doesn't Know Anything About Your Actual Life." Match the platform's native register.
+NATIVE CONTRACT: This is a group chat, not a broadcast. Test: would this feel weird coming from a friend? Then it's too formal. Would a friend actually say this? Then it's right.
+CORPUS INTELLIGENCE: Threads rewards opinions stated as facts. The Gymshark commanding-peer format ("seriously, get back in the gym") works because it reads as a friend, not a brand. Simple verdicts ("most fitness apps were built for someone who doesn't exist") are SwipeHealth's strongest Threads format. The "Think of it as X + Y + Z" analogy bridge works for explaining complex products in one post.
+NEVER: Em-dashes. Over-polished brand language. Hard sells. Multiple CTAs. Phase 2 claims. Shame/fear language.` },
+
+    { id:"youtube_jake", brand:"jake", displayName:"YouTube Shorts — Jake",
+      platformContext:`PLATFORM: YouTube Shorts — Jake personal brand. Discovery platform with YouTube's search infrastructure. Caption has more SEO value here than any other short-form platform.
+
+LENGTH: 150-300 characters optimal. Include searchable keywords naturally in first line for search visibility.
+HOOK RULE: Hook is in the VIDEO. First line of caption should add context OR reinforce the hook AND include the main keyword naturally.
+STRUCTURE: [Hook line with primary keyword naturally embedded] / [1-2 sentences of context] / [CTA] / [3-5 hashtags with search value]
+TONE: Personal, educational, founder-real. Slightly more structured than TikTok — YouTube audience has marginally longer attention spans. Same directness, slightly more context allowed.
+HASHTAGS: 3-5 with search value at end. Think: what would someone search to find this video? Use those. Example: #WorkoutApp #FitnessTracker #WearableFitness #AdaptiveWorkout.
+CTA: "Subscribe for more" works on YouTube in a way it doesn't elsewhere — use it. "Drop a comment if this is your situation." "Watch the full version [link]" if Short is a clip.
+EMOJIS: 1-3. Restrained, similar to TikTok.
+NATIVE CONTRACT: The title does the SEO work. The caption's job is to give the algorithm a second signal and give the viewer one reason to subscribe. Test: does the first sentence include a searchable term and a clear value proposition?
+VALUE-SUBSCRIBE PAIRING: Two things working together: (1) a searchable keyword phrase in the first 10 words (think what someone types into YouTube search at 11pm when thinking about this topic), and (2) a specific reason to subscribe tied to the content. Not generic "subscribe for more" but "subscribe to follow the build" or "subscribe, full breakdown dropping next week." The subscribe CTA should feel like it's offering something, not asking for something.
+SEO REALISM: Keywords should reflect how real people search, not how marketers describe content. "Why I quit my $40M business" not "Entrepreneurship mindset shift." "Does this fitness app actually work" not "Adaptive fitness programming review." Think search bar, not press release.
+CORPUS INTELLIGENCE: YouTube Shorts is the most SEO-driven short-form platform. The title is more important than the caption for search discovery, but both work together. The "I tested X for Y months" extreme-commitment format (Karpathy, Shervin Shares) drives authority regardless of follower count. The "Is It WORTH $X?" format is the most common pre-purchase search query and an ideal frame for SwipeHealth reviews once beta users exist. Jake's best YT Shorts formats: career pivot ("Why I Quit a $40M Business"), build-in-public SEO ("Month 7 Update"), and definitive verdict ("I Tested 6 Fitness Apps").
+NEVER: Em-dashes. Zero keywords (wastes the SEO advantage). Caption that just repeats the video title. Hard sales language. Multiple CTAs. Profanity.` },
+
+    { id:"youtube_swipehealth", brand:"swipehealth", displayName:"YouTube Shorts — SwipeHealth",
+      platformContext:`PLATFORM: YouTube Shorts — SwipeHealth brand. SEO matters most here. Include searchable keywords naturally.
+
+LENGTH: 150-300 characters optimal.
+HOOK RULE: First line should include primary keyword naturally AND hook the viewer. Lead with user's problem or a product scenario. NEVER start with "SwipeHealth" or brand name.
+Keywords to use naturally: workout app, wearable fitness, adaptive training, fitness tracker, personalized workout, recovery-based workout.
+STRUCTURE: [Hook line with primary keyword] / [1-2 sentences of context] / [CTA] / [3-5 search-optimized hashtags]
+TONE: Educational, clear, product-scenario driven. 5th-8th grade reading level. Calm and approachable.
+HASHTAGS: 3-5 search-optimized at end. #WorkoutApp #WearableFitness #AdaptiveTraining #FitnessTracker #SwipeHealth.
+CTA: "Subscribe for more" / "Drop a comment if this is your situation" / "Watch the full version [link]."
+EMOJIS: 1-3. Restrained.
+BETA RULE: NEVER Phase 2 features. Never medical claims. If transcript describes wearable signal adaptation, redirect: frame the data gap problem in the caption, reference SwipeHealth as the solution (personalized programming based on your inputs), optionally tease "wearable integration coming later this year." Never claim overnight data adjusting plans is live in beta.
+PHASE 2 TRAP: Never connect "your wearable data" directly to "SwipeHealth adjusts your workout" as if this works today. SEO keywords like "adaptive training" and "personalized workout" are safe. But "sleep-based workout adaptation" or "recovery-based workout changes" imply Phase 2. Use safe keywords: workout app, personalized workout, adaptive training, fitness tracker, fitness app.
+NATIVE CONTRACT: The title does the SEO work. The caption's job is to give the algorithm a second signal and give the viewer one reason to subscribe. Test: does the first sentence include a searchable term and a clear value proposition?
+VALUE-SUBSCRIBE PAIRING: Two things working together: (1) a searchable keyword phrase in the first 10 words (think what someone types into YouTube search at 11pm), and (2) a specific reason to subscribe tied to the content. Not generic "subscribe for more" but "subscribe, we're posting the full breakdown next week" or "subscribe to see if this actually works." The CTA should offer something.
+SEO REALISM: Keywords should reflect how real people search. "Does SwipeHealth actually work" not "Adaptive fitness programming review." "Best workout app for busy people" not "Personalized exercise solution." Think search bar, not press release.
+CORPUS INTELLIGENCE: YouTube Shorts is the most SEO-driven short-form platform. The title drives search discovery more than the caption, but both work together for keywords. The "Is It WORTH $22.99/Month?" honest review format is the highest-intent search format for SwipeHealth once beta users exist. Scientific comparison and definitive verdict formats (Quantified Scientist, Shervin Shares) drive authority through specificity. SwipeHealth's best YT Shorts formats: "Why Your Fitness App Doesn't Know Your Schedule" (SEO-rich problem statement) and "Personalized Workout App Review: What Makes It Different" (search-intent aligned).
+NEVER: Em-dashes. Zero keywords. Caption that repeats the title verbatim. Hard sales language. Phase 2 claims. Multiple CTAs. Shame/fear language.` }
+  ];
+
+  // Voice profiles (condensed inline versions)
+  const JAKE_VOICE = `You are writing in Jake Hay's voice. Jake is founder/CEO of SwipeHealth. Forbes 30 Under 30. 2x Inc 5000. UT Austin faculty lecturer. NASM-certified personal trainer. Built PopShorts (billions of views for Disney+, Netflix, Adobe, Ford). 60+ industry awards. Left a successful agency career at 30 to build something that changes lives.
+
+CORE IDENTITY:
+Jake is context-driven, mission-focused, credibility-conscious, and relentlessly pragmatic. He code-switches naturally: casual California-warm with friends ("gonna", "brother", parenthetical asides), credibility-forward with investors and the public. Public social content blends both. He is never playing a character. Every version of him is real. He sees everything as a spectrum, not black and white.
+
+HARD RULES — NEVER VIOLATE:
+- NEVER em-dashes (he genuinely hates them — they instantly read as AI)
+- NEVER: delve, unlock, game-changing, revolutionary, seamlessly, groundbreaking, elevate
+- NEVER fabricate stats or inflate numbers (exaggeration in marketing hooks is fine; lying is not)
+- No profanity in any public or professional content
+- Almost never start with "I" — prefer "we", "you", or a strong observation
+- Max 1–2 bullet lists per piece; never multiple bullet blocks in the same caption
+- Short punchy sentences in casual/social contexts; longer and thorough in business contexts
+- NEVER multiple CTAs — one only, at the end
+
+WRITING MECHANICS:
+- Empathy drives persuasion: think about how the reader will receive the message before writing it
+- Lead with the reader's reality ("you"), not Jake's perspective ("I")
+- Raise objections naturally and resolve them simply — don't ignore them
+- Parentheses for asides work well (but not constantly)
+- 5th–8th grade reading level for public content; never jargon without a plain-English follow-up
+- Uses analogies to explain complex concepts (especially adaptive programming and wearable data)
+- Under-promises and over-delivers; never misframes timelines or capabilities
+- "One Mississippi rule": if someone can't understand it in one second, rewrite it
+
+BELIEFS THAT COLOR CONTENT:
+- Fitness = consistency, not six-packs or beast mode or military willpower
+- Most people live in the middle — writing for the optimizer is the wrong audience
+- Real people: work jobs, raise kids, want wins without being yelled at
+- Mission over money: not making a salary; building to change thousands of lives
+- Building in public honestly — nothing to hide because the mission is genuine
+- Imposter syndrome isn't real: doing the thing makes you the person who does the thing
+- Static plans are broken; wearable data without action is useless
+- "My bottom line is not an Excel sheet — it's how many years of healthy life I can give back"
+
+HUMOR AND PERSONALITY:
+- California-warm, quick-witted, uses sarcasm and observational humor
+- Self-deprecating humor sparingly — effective for breaking ice, not for every post
+- Makes everyone feel like a human first, business second
+- First person to smile, first person to crack a joke in a serious room
+- Dry humor works; class clown does not
+
+CREDENTIALS TO REFERENCE (naturally, not as bragging):
+- Forbes 30 Under 30 / 2x Inc 5000 — use when establishing credibility for fitness/tech/business takes
+- UT Austin faculty lecturer — use for education-angle content
+- NASM-certified personal trainer — use for fitness credibility
+- PopShorts founder — billions of views, 60+ industry awards — use for content/marketing angle
+- 7+ months without salary building SwipeHealth — use for build-in-public and mission content
+
+SIGNATURE PHRASES (use occasionally, not in every caption):
+- "Progress over perfection"
+- "Getting wins on the board" / "getting dubs"
+- "A+'s are C's in the real world" / "C's get degrees but C's get you fired"
+- "Real people, real problems, real lives"
+- "My bottom line is not an Excel sheet"
+
+PLATFORM CODE-SWITCHING:
+- TikTok/Threads: casual, California-warm, behind-the-scenes, founder telling his story
+- Instagram: warm, personal, slightly more produced than Threads
+- LinkedIn: credibility-forward, data-backed, founder insight — still human, never corporate
+- X: sharp, opinionated, dry wit, confident — smartest person at the table who doesn't need to show off
+
+CONTENT PRIORITY ORDER:
+Priority 1: A sharp observation or counterintuitive insight about fitness, tech, or building
+Priority 2: A specific data point or market truth
+Priority 3: A personal experience or founder moment
+Priority 4: A SwipeHealth product mention (only if it flows naturally from 1-3)
+Never lead with Priority 4. The goal is professional credibility and strategic awareness, not product promotion.`;
+
+  const SWIPEHEALTH_VOICE = `You are writing in SwipeHealth's brand voice. SwipeHealth is an agentic health operating system that turns wearable data into adaptive workout programming with plain-English explanations.
+
+WHAT SWIPEHEALTH IS:
+One-liner: "From insight to action."
+Hero headline: "Turn wearable insights into daily action."
+Beta headline: "SwipeHealth turns your inputs into a workout plan that adapts to you."
+Key differentiator: "Once you add a wearable, there's no one else doing what we do."
+Price anchor: "$22.99/month — like a personal trainer at a fraction of the cost."
+Disclaimer (use on medical-adjacent content): "SwipeHealth provides general-wellness guidance. It is not a medical device and does not diagnose or treat conditions."
+
+THE CORE PROBLEM WE SOLVE:
+150 million Americans wear health trackers. Almost none know what to do with the data. Three specific gaps:
+1. Plans that can't adapt — static programs run the same regardless of last night's sleep or HRV drop
+2. Tools that don't talk to each other — average user runs 3-4 separate apps that never communicate
+3. Data rich, action poor — wearables show dashboards but never say what to actually change tomorrow
+
+WHAT WE DO DIFFERENTLY:
+We are not a dashboard. We are a decision engine. Every night the system reads biometrics, rebuilds tomorrow's plan, and explains what changed and why in plain English. The user never interprets a chart. They wake up to a plan that already accounts for last night's sleep and yesterday's training load.
+
+FIVE VOICE PILLARS:
+1. Confident — we know what we're doing; state things clearly, don't hedge unnecessarily
+2. Clear — 5th-8th grade reading level; no jargon; if a 12-year-old couldn't understand it, rewrite
+3. Approachable — not military, not dark, not aggressive; built for normal humans
+4. Action-first — every piece of content moves the reader toward a next step
+5. Calm — no fearmongering, no shame, no panic; health is a long game
+
+COPY STRUCTURE: Always Action > Why > Next Step. Lead with what to do. Explain why briefly. Tell them what comes next.
+
+PRIMARY AUDIENCE — THE BUSY IMPROVER:
+Owns an Apple Watch, Fitbit, Garmin, Whoop, or Oura. Interested in health optimization but time-pressed. Frustrated their wearable shows data but never says what to DO. Not training for a competition. Works full-time, possibly has a family, 20-60 min per workout. Wants wins every day without being yelled at.
+
+WHO THEY ARE NOT: elite athletes, biohackers, people who want military-style motivation, people wanting to be shamed or scared.
+
+CORE MESSAGES (use at least one per caption):
+- Pillar 1: "Your wearable data finally means something" — first thing that actually does something with it
+- Pillar 2: "Adapts to your real life" — 20 min or 60 min, good sleep or bad, your plan adjusts
+- Pillar 3: "Plain English always" — every plan change has a one-line reason; never show a chart and leave you guessing
+- Pillar 4: "Built for real people, not athletes" — for the person who works a job and raises kids
+- Pillar 5: "Wins every day" — progress over perfection; no matter what, you're getting a win on the board
+
+TERMINOLOGY:
+USE: "agentic health operating system", "adaptive programming", "plain-English explanations", "workout plan that adapts to you", "your wearable data", "may help / can support", "general wellness", "getting wins on the board"
+AVOID: "AI fitness coach", "smart algorithm", "AI insights", "biometric signals", "achieving fitness goals", "revolutionary", "game-changing"
+
+COMPETITIVE POSITIONING (use naturally when relevant):
+- vs Whoop/Oura/Garmin: "Great at telling you how you slept. We tell you what to do about it."
+- vs Fitbod: "Great programming. We give you programming that adjusts every morning based on how your body actually recovered."
+- vs personal trainer: "Same quality. $22.99 a month instead of $200 a session."
+
+WHAT TO CLAIM IN BETA (April 2026):
+YES: personalized workout programming, equipment-aware planning, plain-English explanations for every decision, progress tracking, $22.99/month, adapts to goals/schedule/equipment, any fitness level, minimum 20-minute workouts
+NO: recovery-based adaptation from wearable signals (Phase 2), nutrition features (Phase 2), full wearable brand integrations (Phase 2), specific wearable API claims, medical/diagnostic claims, guaranteed results
+
+PHASE 2 TRANSCRIPT HANDLING:
+If a transcript describes Phase 2 functionality (overnight wearable data adjusting plans, sleep-based adaptation, HRV-driven programming), DO NOT caption those claims as current beta features. Instead: (1) Frame the PROBLEM the Phase 2 feature solves (the data gap, data-rich action-poor gap), (2) Show what beta does today (personalized programming based on your inputs, $22.99/month, plain-English explanations), (3) If tease is appropriate, use: "Full wearable adaptation coming later this year." The transcript describes the VISION. The caption must reflect REALITY.
+
+NEVER VIOLATE:
+- Medical or diagnostic claims ("treats", "diagnoses", "cures", "clinically proven")
+- Guaranteed results ("will improve", "you'll lose X pounds")
+- Phase 2 features in beta content (nutrition, full wearable adaptation, Garmin/Fitbit/Whoop direct APIs)
+- Shame, fear, or intimidation as motivation
+- Fitness culture aggression ("beast mode", "no excuses", "crush it", "grind")
+- Em-dashes
+- "Revolutionary", "game-changing", "delve", "unlock", "seamlessly", "groundbreaking", "elevate"
+- Starting a caption with "SwipeHealth" or any brand name
+- Multiple CTAs in one caption
+
+CONTENT PRIORITY ORDER:
+Priority 1: A sharp observation or counterintuitive insight about the fitness/health data gap
+Priority 2: A specific data point or market truth (68% abandon rate, 150M wearable users, $22.99 vs $200)
+Priority 3: A specific user scenario showing the problem or the beta solution
+Priority 4: A direct product feature mention (only if it flows naturally from 1-3)
+Never lead with Priority 4. The goal is strategic awareness and credibility, not promotion.`;
+
+  const CAPTION_PLAYBOOK = `CAPTION PLAYBOOK — FULL SYSTEM
+
+== 8 ARCHETYPES (assign one before writing) ==
+
+1. METRIC EXPLAINER: Explains a confusing health/tech metric in plain English. Hook: "Most people don't understand X." Builds trust by teaching. Comments: questions and appreciation. Use for: HRV, recovery scores, adaptive programming explainers.
+
+2. BOLD THESIS: Stakes a strong, verifiable claim about a category shift. Hook: declarative statement + dramatic implication. Invites debate. Comments: agreement, disagreement, "here's my take." Use for: "The static workout plan era is over." "Your wearable data has been useless. Until now."
+
+3. BUILD-IN-PUBLIC UPDATE: Honest progress on something being built. Hook: announcement + honest acknowledgment of difficulty. Comments: encouragement, questions about the build. Use for: launch milestones, waitlist updates, technical decisions, founder journey.
+
+4. PERSONAL METRIC MOMENT: Turns a single data point into an identity or behavior story. Hook: specific metric + emotional reaction. Comments: "mine too", "what's your protocol?", sharing scores. Use for: user scenarios, Jake's personal health data transparency.
+
+5. RESEARCH/DATA DROP: Shares a study or dataset with clear practical implications. Hook: study + specific stat + "here's what this means." Comments: shares, saves, follow-up questions. Use for: 68% abandon rate, 150M wearable users, fitness behavior research.
+
+6. MYTH-BUSTER: Challenges a common assumption with domain expertise. Hook: "The common advice is X. But actually..." Comments: debate, nuance additions. Use for: "Your fitness app isn't failing you. It just wasn't built for your life."
+
+7. PRACTICAL LIST: Numbered or bulleted actionable items. Hook: "Here are [N] ways to [desired outcome]." Comments: "I'd add X", "Number 3 is underrated." Use for: signs your workout plan isn't built for real life, ways to improve recovery.
+
+8. QUANTIFIED CASE STUDY: Real data over significant time tells a transformation story. Hook: time duration + specific metric + counterintuitive outcome. Comments: "what's your setup?", inspiration. Use for: beta user results, before/after scenarios.
+
+== 10 HOOK FORMULAS (pick one per caption) ==
+
+H1 SPECIFIC NUMBER DROP: Open with a precise surprising number. No context first.
+"68% of wearable owners abandon companion apps in 6 months."
+"150 million Americans wear health trackers. Almost none know what to do with the data."
+
+H2 BOLD DECLARATION: State a category-shift claim as fact. No hedging.
+"Static workout plans are broken." | "Your fitness app isn't failing you. It just wasn't designed for your actual life."
+
+H3 QUESTION THAT CHALLENGES ASSUMPTION: Ask the question the audience has but hasn't voiced.
+"You've been tracking your sleep for months. But does your workout actually know that?"
+
+H4 COUNTERINTUITIVE REFRAME: Take something they think they understand and flip it.
+"More data isn't the problem. No one telling you what to do with it is."
+
+H5 EXCITING ANNOUNCEMENT WITH HONEST CAVEAT: Lead with the news, immediately acknowledge the hard truth.
+"SwipeHealth exercise beta launches April 9. It's not everything we want it to be yet."
+
+H6 EMPATHY OPEN: Open by naming a specific frustration the audience knows exactly.
+"You slept 4 hours. Your fitness app still wants you to do leg day."
+
+H7 RESEARCH ANCHOR: Open with a data point and let the implication pull the reader forward.
+"New research: 68% of wearable users quit their companion app in 6 months. Not because they stopped caring."
+
+H8 TEACH-FIRST OPEN: Define a term as the opening move.
+"What IS adaptive programming? Simple version."
+
+H9 LIST PROMISE: Signal value immediately with a numbered promise.
+"3 things I wish someone told me about building a health tech startup."
+
+H10 STATUS FLEX (authority-earned only): Works only when the creator has significant audience.
+"60+ industry awards. 2 billion views. Now starting over for a reason." (Deploy only after Jake has built substantial following.)
+
+== 5 TOP-PERFORMING STRUCTURES ==
+
+S1 HOOK > PROBLEM > SOLUTION > CTA
+Best for: SwipeHealth brand, product positioning, awareness.
+[Bold hook] / [Problem expansion, 2-3 short sentences, familiar] / [Solution, specific, concrete, no hype] / [One CTA]
+
+S2 THESIS > EVIDENCE > IMPLICATION > CTA
+Best for: Bold takes, Jake LinkedIn, industry commentary.
+[Declarative thesis] / [Evidence 1] / [Evidence 2] / [Evidence 3] / [Implication] / [Debate question CTA]
+
+S3 MOMENT > FEELING > LESSON > CTA
+Best for: Personal brand, build-in-public, founder vulnerability.
+[Specific moment that happened] / [Honest reaction, not how you wish it felt] / [Humble lesson] / ["Has anyone else experienced this?"]
+
+S4 METRIC > CONTEXT > PRACTICAL RULE > CTA
+Best for: Educational content, HRV/recovery explainers.
+[Name the metric] / [Plain-English explanation] / [What high means. What low means.] / [The practical rule: what to DO with this] / [CTA]
+
+S5 ANNOUNCEMENT > SPECIFICS > WHAT'S NEXT > CTA
+Best for: Product launches, waitlist updates, milestone posts.
+[The announcement] / [Specific detail 1, 2, 3] / [What comes next, honest framing] / [CTA]
+
+== CTA RULES ==
+
+DRIVES COMMENTS: specific opinion question ("What metric do you actually pay attention to?"), debate invitation ("Agree or disagree?"), add-your-own ("What would you add?")
+DRIVES SHARES: content that makes the sharer look smart (no explicit CTA needed)
+DRIVES SAVES: practical list or how-to ("Save this for when you need it")
+DRIVES FOLLOWS: build-in-public update ("Follow to watch this build")
+
+TOP-PERFORMING CTAs: "Agree or disagree?" / "What does your wearable actually tell you to do?" / "Has anyone else experienced this?" / "What would you add to this list?"
+KILLED ENGAGEMENT: "Like and share if you agree" / "Let me know your thoughts below" / "Drop a comment!" / Multiple CTAs
+
+ONE CTA MAXIMUM PER CAPTION. Non-negotiable.
+
+== 7 PSYCHOLOGICAL TRIGGERS ==
+
+1. Identity Threat/Affirmation: Make the reader feel seen or challenged as a specific type of person
+2. Curiosity Gap: Imply information without giving it all upfront
+3. Specificity as Credibility: Exact numbers trigger trust; vague claims trigger skepticism
+4. Shared Frustration: Name the frustration before offering the solution
+5. Social Proof by Specificity: Specific outcomes attributed to specific behaviors
+6. Expert Framing Without Gatekeeping: Share expertise in a way that makes the reader smarter, not smaller
+7. Add-Your-Own Engine: Structure content so readers naturally want to contribute their perspective
+
+== 5 FAILURE PATTERNS TO AVOID ==
+
+F1 OPENING WITH BRAND NAME: "SwipeHealth announced..." = instant skip. Lead with the user's problem.
+F2 CLAIMING WITHOUT PROVING: "Revolutionary adaptive technology" triggers skepticism. "Your plan adjusts based on last night's HRV" creates belief.
+F3 WRITING FOR THE OPTIMIZER: Wearables niche writes for performance maximizers. SwipeHealth's audience is the parent working 50 hours a week. Write for them.
+F4 LONG-FORM WITH NO WHITE SPACE: Dense unbroken paragraphs kill posts. White space is not optional on LinkedIn/Instagram/Facebook.
+F5 PREMATURE FLEX: Bryan Johnson's 99.1 percentile post works because he has 300k+ followers. Jake needs to earn that right with education and build-in-public content first.
+
+== FORMATTING RULES BY PLATFORM ==
+LinkedIn: 900-1,800 chars, blank line between every 2-3 sentence paragraph (non-negotiable), 3-5 niche hashtags at end only, 0-2 emojis max, first 210 chars = hook, end with one specific question CTA
+TikTok: 100-150 chars, 3-5 hashtags at end, 1-3 emojis, one soft CTA
+Instagram Feed: 150-300 chars (Reels) or 800-1,200 (carousels), 5-10 hashtags after line break, 2-5 emojis, first 125 chars = hook
+X: 280 chars hard limit, 0-1 hashtags, 0-2 emojis, whole tweet is the hook
+Threads: 150-300 chars, 0 hashtags, 1-3 casual emojis
+YouTube Shorts: 150-300 chars, 3-5 search-optimized hashtags, include primary keyword in first line
+Facebook: 150-300 words, 0-3 hashtags, 1-3 conservative emojis, warm conversational tone
+
+UNIVERSAL: Never em-dashes. Never AI-giveaway words. Never start with "I" or brand name. Never multiple CTAs. Short sentences over long. White space generously used.
+
+STRATEGIC POSITIONING RULE: The goal of every caption is professional credibility and strategic awareness, NOT user acquisition or direct selling. Make the reader think "this person understands something I don't." Product mentions are Priority 4 (last). Insight is Priority 1 (first). A caption that makes someone think is worth more than a caption that describes a feature.`;
+
+  // ── SYSTEM PROMPT BUILDER ──
+  function buildSystemPrompt(brand, platformContext) {
+    const voice = brand === "jake" ? JAKE_VOICE : SWIPEHEALTH_VOICE;
+    return `You are an expert social media copywriter generating a single platform-specific caption.
+
+INSTRUCTION PRIORITY ORDER — apply these in sequence, higher numbers yield to lower:
+1. HARD RULES (non-negotiable: no em-dashes, no AI words, no Phase 2 claims in beta, no shame language, no "I" opener, no brand name opener, one CTA max)
+2. VOICE PROFILE (defines who is speaking and how they sound)
+3. STRATEGIC POSITIONING (the goal is professional credibility and insight, not promotion or user acquisition)
+4. PLATFORM CONTEXT (defines format, length, native feel)
+5. CAPTION PLAYBOOK (hook formulas, structures, patterns to draw from)
+
+When rules conflict: higher priority wins. Platform format never overrides voice. Voice never overrides hard rules. Use playbook patterns only when they serve the voice naturally. Never force a pattern onto content that doesn't need it.
+
+OUTPUT RULES — CRITICAL:
+- Output ONLY the caption text
+- No preamble ("Here's your caption:", "Sure!", etc.)
+- No explanation after the caption
+- No quotation marks wrapping the whole caption
+- Just the raw caption, ready to copy-paste
+
+---
+
+${voice}
+
+---
+
+STRATEGIC POSITIONING RULE:
+The goal of this content is NOT to acquire users or sell the product directly. The goal is professional credibility and strategic awareness. Position Jake and SwipeHealth as sharp thinkers in the health tech and fitness space. Captions should make the reader think "this person understands something I don't" or "I hadn't thought about it that way." Product mentions are secondary. Insight is primary. A caption that makes someone think is worth more than a caption that describes a feature.
+
+CONTENT PRIORITY ORDER:
+Priority 1: A sharp observation or counterintuitive insight
+Priority 2: A specific data point or market truth
+Priority 3: A personal experience or founder moment
+Priority 4: A product mention (only if it flows naturally from 1-3)
+Never lead with Priority 4.
+
+---
+
+PLATFORM-SPECIFIC INSTRUCTIONS:
+${platformContext}
+
+---
+
+${CAPTION_PLAYBOOK}
+
+---
+
+YOUR TASK: You will receive a video transcript or script. Extract the core insight/story/message. Apply the priority order above: hard rules first, then voice, then strategic positioning, then platform context, then playbook patterns. Output ONLY the final caption.`;
+  }
+
+  // ── API CALLS ──
+  async function generateSingleCaption(brand, platform, transcript, apiKeys) {
+    const systemPrompt = buildSystemPrompt(brand, platform.platformContext);
+    const extraContext = document.getElementById("extra-context-input").value.trim();
+    let userPrompt = `TRANSCRIPT:\n${transcript}`;
+    if (extraContext) {
+      userPrompt += `\n\nADDITIONAL CONTEXT FOR THIS RUN:\n${extraContext}\nApply this context when generating all captions.`;
+    }
+    userPrompt += `\n\nGenerate the caption now.`;
+
+    if (state.model === "gemini") {
+      return generateWithGemini(systemPrompt, userPrompt, apiKeys.gemini);
+    }
+    // Default: Claude
+    return generateWithClaude(systemPrompt, userPrompt, apiKeys.anthropic);
+  }
+
+  async function generateWithClaude(systemPrompt, userPrompt, anthropicKey) {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "x-api-key": anthropicKey
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Claude error ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.content.filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+  }
+
+  async function generateWithGemini(systemPrompt, userPrompt, geminiKey) {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ parts: [{ text: userPrompt }] }],
+          generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || err.error?.status || `Gemini error ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(`Gemini error: ${data.error.message || data.error.status}`);
+    }
+    if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+      throw new Error("Gemini returned no content");
+    }
+    return data.candidates[0].content.parts[0].text.trim();
+  }
+
+  async function transcribeFile(file, openaiKey) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("model", "whisper-1");
+    formData.append("language", "en");
+    formData.append("response_format", "text");
+
+    const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${openaiKey}` },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Whisper error ${response.status}`);
+    }
+
+    return await response.text();
+  }
+
+  async function cleanTranscript(rawTranscript, anthropicKey) {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "x-api-key": anthropicKey
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: "You are a transcript editor. Clean the raw speech-to-text transcript into readable text. Fix punctuation, remove excessive filler words (um, uh), fix run-on sentences. Preserve the speaker's voice, personality, all key ideas and specific details. Output ONLY the cleaned transcript, nothing else.",
+        messages: [{ role: "user", content: `Clean this transcript:\n\n${rawTranscript}` }]
+      })
+    });
+    if (!response.ok) return rawTranscript;
+    const data = await response.json();
+    return data.content.filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+  }
+
+  // ── CLARITY CHECK ──
+  async function checkTranscriptClarity(transcript, anthropicKey) {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "x-api-key": anthropicKey
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 80,
+        system: "Read this transcript. Assess whether it contains enough context to generate platform-specific social captions. Specifically check: (1) Is the core topic or message clear? (2) Is there a specific insight, story, or claim? (3) Is there enough substance for a LinkedIn caption of 900+ characters? If ALL THREE are yes, respond with exactly: CLEAR. If any are unclear, respond with exactly: UNCLEAR: [one sentence explaining what's missing]. Nothing else.",
+        messages: [{ role: "user", content: transcript }]
+      })
+    });
+    if (!response.ok) return "CLEAR"; // On error, proceed
+    const data = await response.json();
+    return data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+  }
+
+  function showClarityBanner(reason) {
+    let banner = document.getElementById("clarity-banner");
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.id = "clarity-banner";
+      banner.className = "notice notice-warn";
+      banner.style.marginTop = "12px";
+      const generateBtn = document.getElementById("generate-btn");
+      generateBtn.parentNode.insertBefore(banner, generateBtn);
+    }
+    banner.style.display = "flex";
+    banner.innerHTML = `
+      <div style="flex:1;">
+        <strong>Clarity check:</strong> ${reason}<br>
+        <span style="font-size:12px;color:#78716C;">Add more context for stronger captions, or generate anyway.</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <button onclick="dismissClarityBanner();document.getElementById('transcript-input').focus();"
+          style="padding:6px 14px;border:1px solid #D97706;border-radius:6px;background:white;color:#92400E;font-size:12px;font-weight:600;cursor:pointer;">
+          Add Context
+        </button>
+        <button onclick="dismissClarityBanner();generateAnyway();"
+          style="padding:6px 14px;border:none;border-radius:6px;background:#D97706;color:white;font-size:12px;font-weight:600;cursor:pointer;">
+          Generate Anyway
+        </button>
+      </div>
+    `;
+  }
+
+  window.dismissClarityBanner = function() {
+    const banner = document.getElementById("clarity-banner");
+    if (banner) banner.style.display = "none";
+  };
+
+  window.generateAnyway = function() {
+    state.skipClarityCheck = true;
+    handleGenerate();
+  };
+
+  // ── UI HELPERS ──
+  window.selectModel = function(model) {
+    state.model = model;
+    document.querySelectorAll("#model-selector .model-tab").forEach(tab => {
+      tab.classList.toggle("active", tab.dataset.model === model);
+    });
+    checkGenerateReady();
+  };
+
+  window.selectBrand = function(brand) {
+    state.brand = brand;
+    document.getElementById("btn-jake").classList.toggle("selected", brand === "jake");
+    document.getElementById("btn-swipehealth").classList.toggle("selected", brand === "swipehealth");
+
+    // Show/hide Facebook row
+    document.getElementById("row-facebook").style.display = brand === "swipehealth" ? "flex" : "none";
+
+    // Reset all toggles to ON for this brand
+    Object.keys(state.enabledPlatforms).forEach(key => { state.enabledPlatforms[key] = true; });
+    document.querySelectorAll('#platform-grid input[data-platform]').forEach(cb => { cb.checked = true; });
+    document.getElementById("toggle-all").checked = true;
+
+    updateCaptionCount();
+    updateSteps();
+    checkGenerateReady();
+  };
+
+  window.switchMode = function(mode) {
+    state.inputMode = mode;
+    document.getElementById("mode-transcript").style.display = mode === "transcript" ? "block" : "none";
+    document.getElementById("mode-upload").style.display = mode === "upload" ? "block" : "none";
+    document.getElementById("tab-transcript").classList.toggle("active", mode === "transcript");
+    document.getElementById("tab-upload").classList.toggle("active", mode === "upload");
+    updateSteps();
+    checkGenerateReady();
+  };
+
+  window.toggleKeyVisibility = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isPassword = input.type === "password";
+    input.type = isPassword ? "text" : "password";
+    btn.textContent = isPassword ? "🙈" : "👁";
+  };
+
+  // ── EXTRA CONTEXT ──
+  window.toggleExtraContext = function() {
+    const header = document.getElementById("context-header");
+    const body = document.getElementById("context-body");
+    header.classList.toggle("open");
+    body.classList.toggle("open");
+  };
+
+  // ── PLATFORM TOGGLES ──
+  window.toggleAllPlatforms = function(checked) {
+    document.querySelectorAll('#platform-grid input[data-platform]').forEach(cb => {
+      cb.checked = checked;
+      state.enabledPlatforms[cb.dataset.platform] = checked;
+    });
+    updateCaptionCount();
+    updateSteps();
+    checkGenerateReady();
+  };
+
+  window.onPlatformToggle = function() {
+    document.querySelectorAll('#platform-grid input[data-platform]').forEach(cb => {
+      state.enabledPlatforms[cb.dataset.platform] = cb.checked;
+    });
+
+    // Update "All Platforms" toggle
+    const allToggle = document.getElementById("toggle-all");
+    const visibleToggles = getVisiblePlatformToggles();
+    const allOn = visibleToggles.every(cb => cb.checked);
+    allToggle.checked = allOn;
+
+    updateCaptionCount();
+    updateSteps();
+    checkGenerateReady();
+  };
+
+  function getVisiblePlatformToggles() {
+    return Array.from(document.querySelectorAll('#platform-grid input[data-platform]')).filter(cb => {
+      const row = cb.closest('.platform-row');
+      return row.style.display !== 'none';
+    });
+  }
+
+  function getSelectedPlatformCount() {
+    const visibleToggles = getVisiblePlatformToggles();
+    return visibleToggles.filter(cb => cb.checked).length;
+  }
+
+  function updateCaptionCount() {
+    const count = getSelectedPlatformCount();
+    document.getElementById("caption-count").textContent = count;
+    updateGenerateBtnLabel();
+  }
+
+  function updateGenerateBtnLabel() {
+    if (state.isGenerating) return;
+    const count = getSelectedPlatformCount();
+    if (!state.brand) {
+      document.getElementById("generate-btn").textContent = "✨ Generate Captions";
+    } else {
+      document.getElementById("generate-btn").textContent = `✨ Generate ${count} Caption${count !== 1 ? 's' : ''}`;
+    }
+  }
+
+  function getSelectedPlatforms() {
+    // Filter PLATFORMS by brand AND by enabled toggles
+    return PLATFORMS.filter(p => {
+      if (p.brand !== state.brand) return false;
+      // Match platform id prefix to toggle key
+      for (const [key, prefix] of Object.entries(PLATFORM_KEY_MAP)) {
+        if (p.id.startsWith(prefix + "_") && state.enabledPlatforms[key]) return true;
+      }
+      return false;
+    });
+  }
+
+  function updateSteps() {
+    const hasBrand = !!state.brand;
+    const hasContent = state.inputMode === "transcript"
+      ? document.getElementById("transcript-input").value.trim().length > 20
+      : !!state.uploadedFile;
+    const hasContext = document.getElementById("extra-context-input").value.trim().length > 0;
+    const hasPlatforms = getSelectedPlatformCount() > 0;
+
+    for (let i = 1; i <= 6; i++) {
+      const el = document.getElementById(`step-${i}`);
+      el.classList.remove("active", "done");
+    }
+
+    // Steps 1-2 done when brand + content
+    if (hasBrand && hasContent) {
+      document.getElementById("step-1").classList.add("done");
+      document.getElementById("step-2").classList.add("done");
+    } else if (hasBrand) {
+      document.getElementById("step-1").classList.add("done");
+      document.getElementById("step-2").classList.add("active");
+    } else {
+      document.getElementById("step-1").classList.add("active");
+    }
+
+    // Step 3 done if context added
+    if (hasContext) {
+      document.getElementById("step-3").classList.add("done");
+      document.getElementById("step-3").classList.remove("muted-step");
+    } else {
+      document.getElementById("step-3").classList.add("muted-step");
+    }
+
+    // Step 4 done if at least one platform selected
+    if (hasPlatforms && hasBrand) {
+      document.getElementById("step-4").classList.add("done");
+    }
+
+    // Step 5 active while generating
+    if (state.isGenerating) {
+      document.getElementById("step-5").classList.add("active");
+    }
+
+    // Step 6 active when results exist
+    if (state.results.length > 0 && !state.isGenerating) {
+      document.getElementById("step-6").classList.add("active");
+    }
+  }
+
+  function checkGenerateReady() {
+    const anthropicKey = document.getElementById("anthropic-key").value.trim();
+    const geminiKey = document.getElementById("gemini-key").value.trim();
+    const hasKey = state.model === "gemini" ? geminiKey.length > 5 : anthropicKey.length > 10;
+    const hasBrand = !!state.brand;
+    const hasContent = state.inputMode === "transcript"
+      ? document.getElementById("transcript-input").value.trim().length > 20
+      : !!state.uploadedFile;
+    const hasPlatforms = getSelectedPlatformCount() > 0;
+
+    const ready = hasKey && hasBrand && hasContent && hasPlatforms;
+    document.getElementById("generate-btn").disabled = !ready;
+    updateGenerateBtnLabel();
+  }
+
+  // ── FILE HANDLING ──
+  window.handleFileSelect = function(event) {
+    const file = event.target.files[0];
+    if (file) setUploadedFile(file);
+  };
+
+  window.handleDragOver = function(event) {
+    event.preventDefault();
+    document.getElementById("upload-zone").classList.add("drag-over");
+  };
+
+  window.handleDragLeave = function() {
+    document.getElementById("upload-zone").classList.remove("drag-over");
+  };
+
+  window.handleDrop = function(event) {
+    event.preventDefault();
+    document.getElementById("upload-zone").classList.remove("drag-over");
+    const file = event.dataTransfer.files[0];
+    if (file) setUploadedFile(file);
+  };
+
+  function setUploadedFile(file) {
+    const maxSize = 25 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(`File too large (${(file.size/1024/1024).toFixed(1)}MB). Max is 25MB.`);
+      return;
+    }
+    state.uploadedFile = file;
+    const zone = document.getElementById("upload-zone");
+    zone.classList.add("has-file");
+    const info = document.getElementById("file-info");
+    info.style.display = "block";
+    info.textContent = `✅ ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
+    checkGenerateReady();
+  }
+
+  // ── GENERATE HANDLER ──
+  window.handleGenerate = async function() {
+    const anthropicKey = document.getElementById("anthropic-key").value.trim();
+    const openaiKey = document.getElementById("openai-key").value.trim();
+    const geminiKey = document.getElementById("gemini-key").value.trim();
+
+    // Key validation based on selected model
+    if (state.model === "claude" && !anthropicKey) { alert("Please enter your Anthropic API key."); return; }
+    if (state.model === "gemini" && !geminiKey) { alert("Add your Google API key to use Gemini."); return; }
+    // Anthropic key is always needed for clarity check and transcript cleaning
+    if (!anthropicKey && state.model !== "claude") {
+      // Still need it for clarity check — but we can skip if missing
+    }
+    if (!state.brand) { alert("Please select a brand."); return; }
+
+    const apiKeys = { anthropic: anthropicKey, openai: openaiKey, gemini: geminiKey };
+
+    state.isGenerating = true;
+    state.results = [];
+    document.getElementById("generate-btn").disabled = true;
+    document.getElementById("empty-state").style.display = "none";
+    updateSteps();
+
+    let transcript = "";
+
+    // Step A: Get transcript
+    try {
+      if (state.inputMode === "upload") {
+        if (!openaiKey) { alert("OpenAI API key required for video transcription."); resetGenerateBtn(); return; }
+        if (!state.uploadedFile) { alert("Please upload a file first."); resetGenerateBtn(); return; }
+
+        updateProgressUI(0, 1, "Transcribing audio with Whisper...");
+        document.getElementById("progress-wrap").style.display = "block";
+
+        transcript = await transcribeFile(state.uploadedFile, openaiKey);
+        updateProgressUI(0, 1, "Cleaning transcript...");
+        transcript = await cleanTranscript(transcript, anthropicKey);
+
+        // Show cleaned transcript for review
+        document.getElementById("transcript-preview").style.display = "block";
+        document.getElementById("transcript-preview-text").value = transcript;
+
+      } else {
+        transcript = document.getElementById("transcript-input").value.trim();
+        if (!transcript) { alert("Please paste a transcript."); resetGenerateBtn(); return; }
+      }
+    } catch (err) {
+      alert(`Transcription failed: ${err.message}`);
+      resetGenerateBtn();
+      return;
+    }
+
+    // Step A.5: Clarity check — lightweight pre-generation assessment (requires Anthropic key)
+    if (!state.skipClarityCheck && anthropicKey) {
+      try {
+        updateProgressUI(0, 1, "Checking transcript clarity...");
+        document.getElementById("progress-wrap").style.display = "block";
+        const clarityResult = await checkTranscriptClarity(transcript, anthropicKey);
+        if (clarityResult && clarityResult.startsWith("UNCLEAR")) {
+          const reason = clarityResult.replace("UNCLEAR:", "").replace("UNCLEAR", "").trim();
+          showClarityBanner(reason || "The transcript may not have enough context for strong captions.");
+          resetGenerateBtn();
+          state.pendingTranscript = transcript;
+          state.isGenerating = false;
+          return;
+        }
+      } catch (e) {
+        // If clarity check fails, proceed anyway
+        console.warn("Clarity check failed, proceeding:", e.message);
+      }
+    }
+    state.skipClarityCheck = false; // Reset for next run
+
+    // Step B: Generate captions in parallel (only selected platforms)
+    const platforms = getSelectedPlatforms();
+    if (platforms.length === 0) { alert("Please select at least one platform."); resetGenerateBtn(); state.isGenerating = false; updateSteps(); return; }
+    state.totalPlatforms = platforms.length;
+    let completed = 0;
+    state.results = [];
+
+    document.getElementById("generate-btn").textContent = `⏳ Generating 0 of ${platforms.length}...`;
+    document.getElementById("progress-wrap").style.display = "block";
+    document.getElementById("results-section").style.display = "block";
+    renderSkeletons(platforms);
+
+    updateProgressUI(0, platforms.length, `Generating ${platforms.length} captions in parallel...`);
+
+    const promises = platforms.map(platform =>
+      generateSingleCaption(state.brand, platform, transcript, apiKeys)
+        .then(caption => {
+          completed++;
+          updateProgressUI(completed, platforms.length, `Generated ${completed} of ${platforms.length} captions...`);
+          document.getElementById("generate-btn").textContent = `⏳ Generating ${completed} of ${platforms.length}...`;
+          const result = { platformId: platform.id, displayName: platform.displayName, caption, error: null };
+          state.results.push(result);
+          updateCaptionCard(result);
+          return result;
+        })
+        .catch(err => {
+          completed++;
+          updateProgressUI(completed, platforms.length, `Generated ${completed} of ${platforms.length} captions...`);
+          document.getElementById("generate-btn").textContent = `⏳ Generating ${completed} of ${platforms.length}...`;
+          const result = { platformId: platform.id, displayName: platform.displayName, caption: "", error: err.message };
+          state.results.push(result);
+          updateCaptionCard(result);
+          return result;
+        })
+    );
+
+    await Promise.all(promises);
+
+    // Done
+    updateProgressUI(platforms.length, platforms.length, `✅ All ${platforms.length} captions ready!`);
+    state.isGenerating = false;
+    updateSteps();
+    document.getElementById("results-meta").textContent = `${platforms.length} captions · ${state.brand === "jake" ? "Jake Personal Brand" : "SwipeHealth Brand"} · ${getModelLabel()}`;
+
+    setTimeout(() => {
+      document.getElementById("progress-wrap").style.display = "none";
+    }, 2000);
+
+    resetGenerateBtn();
+  };
+
+  function resetGenerateBtn() {
+    state.isGenerating = false;
+    document.getElementById("generate-btn").disabled = false;
+    updateGenerateBtnLabel();
+    checkGenerateReady();
+  }
+
+  function updateProgressUI(completed, total, message) {
+    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    document.getElementById("progress-bar").style.width = `${pct}%`;
+    document.getElementById("progress-text").textContent = message;
+  }
+
+  // ── RENDER RESULTS ──
+  function renderSkeletons(platforms) {
+    const grid = document.getElementById("captions-grid");
+    grid.innerHTML = platforms.map(p => `
+      <div class="caption-skeleton" id="card-${p.id}">
+        <div class="skeleton-header"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line" style="width:85%"></div>
+          <div class="skeleton-line" style="width:70%"></div>
+          <div class="skeleton-line"></div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function getModelLabel() {
+    if (state.model === "gemini") return "Gemini";
+    return "Claude";
+  }
+
+  function updateCaptionCard(result) {
+    const el = document.getElementById(`card-${result.platformId}`);
+    if (!el) return;
+
+    const brandLabel = result.displayName.includes("Jake") ? "Jake" : "SwipeHealth";
+    const badgeClass = result.displayName.includes("Jake") ? "badge-jake" : "badge-swipehealth";
+    const platformName = result.displayName.replace(" — Jake", "").replace(" — SwipeHealth", "");
+    const charCount = result.caption.length;
+    const modelLabel = result.model || getModelLabel();
+
+    el.className = "caption-card";
+    el.innerHTML = result.error
+      ? `
+        <div class="caption-card-header">
+          <span class="caption-platform">${platformName}</span>
+          <div><span class="caption-brand-badge ${badgeClass}">${brandLabel}</span><span class="badge-model">${modelLabel}</span></div>
+        </div>
+        <div class="caption-error">⚠️ Error: ${result.error}</div>
+      `
+      : `
+        <div class="caption-card-header">
+          <span class="caption-platform">${platformName}</span>
+          <div><span class="caption-brand-badge ${badgeClass}">${brandLabel}</span><span class="badge-model">${modelLabel}</span></div>
+        </div>
+        <div class="caption-body" id="body-${result.platformId}">${escapeHtml(result.caption)}</div>
+        <div class="caption-card-footer">
+          <button class="copy-btn" id="copybtn-${result.platformId}" onclick="copyCaption('${result.platformId}')">
+            Copy Caption
+          </button>
+          <span class="char-count">${charCount} chars</span>
+        </div>
+      `;
+  }
+
+  window.copyCaption = function(platformId) {
+    const result = state.results.find(r => r.platformId === platformId);
+    if (!result) return;
+    navigator.clipboard.writeText(result.caption).then(() => {
+      const btn = document.getElementById(`copybtn-${platformId}`);
+      btn.textContent = "✅ Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = "Copy Caption";
+        btn.classList.remove("copied");
+      }, 2000);
+    });
+  };
+
+  window.copyAll = function() {
+    const allText = state.results
+      .filter(r => !r.error)
+      .map(r => `=== ${r.displayName} ===\n\n${r.caption}`)
+      .join("\n\n---\n\n");
+    navigator.clipboard.writeText(allText).then(() => {
+      const btn = document.querySelector(".copy-all-btn");
+      btn.textContent = "✅ All Copied!";
+      setTimeout(() => { btn.textContent = "Copy All as Text"; }, 2000);
+    });
+  };
+
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\n/g, "<br>");
+  }
+
+  // ── EVENT LISTENERS ──
+  document.getElementById("anthropic-key").addEventListener("input", checkGenerateReady);
+  document.getElementById("gemini-key").addEventListener("input", checkGenerateReady);
+  document.getElementById("transcript-input").addEventListener("input", () => {
+    state.transcript = document.getElementById("transcript-input").value;
+    updateSteps();
+    checkGenerateReady();
+  });
+  document.getElementById("extra-context-input").addEventListener("input", () => {
+    const hasContent = document.getElementById("extra-context-input").value.trim().length > 0;
+    document.getElementById("context-indicator").style.display = hasContent ? "inline" : "none";
+    state.extraContext = document.getElementById("extra-context-input").value.trim();
+    updateSteps();
+  });
+
+  // Initialize caption count on load
+  updateCaptionCount();
+</script>
+
+</body>
+</html>
