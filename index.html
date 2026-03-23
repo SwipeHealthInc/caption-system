@@ -973,7 +973,7 @@
     <div class="notice notice-info">
       ℹ️ Gemini is ready to use by default. To use Claude or Whisper, paste your own API keys below.
     </div>
-    <div class="key-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="key-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
       <div class="key-field">
         <label>Anthropic API Key (Claude)</label>
         <div class="key-input-wrap">
@@ -998,12 +998,21 @@
         </div>
         <div class="key-status" id="gemini-key-status">Enter your API key above</div>
       </div>
+      <div class="key-field">
+        <label>Groq API Key</label>
+        <div class="key-input-wrap">
+          <input type="password" class="key-input" id="groq-key" placeholder="gsk_..." autocomplete="off" />
+          <button class="key-toggle" onclick="toggleKeyVisibility('groq-key', this)">👁</button>
+        </div>
+        <div class="key-status" id="groq-key-status">Free at groq.com — 14,400 req/day</div>
+      </div>
     </div>
     <div style="margin-top:12px;">
       <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Generation Model</label>
       <div class="model-selector" id="model-selector">
         <button class="model-tab" data-model="claude" onclick="selectModel('claude')">Claude Sonnet 4</button>
         <button class="model-tab active" data-model="gemini" onclick="selectModel('gemini')">Gemini 2.0 Flash</button>
+        <button class="model-tab" data-model="groq" onclick="selectModel('groq')">Groq Llama 3.3 70B</button>
       </div>
     </div>
   </div>
@@ -1883,6 +1892,9 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     if (state.model === "gemini") {
       return generateWithGemini(systemPrompt, userPrompt, apiKeys.gemini);
     }
+    if (state.model === "groq") {
+      return generateWithGroq(systemPrompt, userPrompt, apiKeys.groq);
+    }
     // Default: Claude
     return generateWithClaude(systemPrompt, userPrompt, apiKeys.anthropic);
   }
@@ -1942,6 +1954,36 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     return data.candidates[0].content.parts[0].text.trim();
   }
 
+  async function generateWithGroq(systemPrompt, userPrompt, groqKey) {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${groqKey}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        max_tokens: 1000,
+        temperature: 0.7,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Groq error ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.choices || !data.choices[0]?.message?.content) {
+      throw new Error("Groq returned no content");
+    }
+    return data.choices[0].message.content.trim();
+  }
+
   async function transcribeFile(file, openaiKey) {
     const formData = new FormData();
     formData.append("file", file);
@@ -1967,13 +2009,15 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     const systemMsg = "You are a transcript editor. Clean the raw speech-to-text transcript into readable text. Fix punctuation, remove excessive filler words (um, uh), fix run-on sentences. Preserve the speaker's voice, personality, all key ideas and specific details. Output ONLY the cleaned transcript, nothing else.";
     const userMsg = `Clean this transcript:\n\n${rawTranscript}`;
 
-    // Use Gemini if no Anthropic key
+    // Use selected model's fallback if no Anthropic key
     if (!anthropicKey) {
       const geminiKey = document.getElementById("gemini-key").value.trim();
-      if (!geminiKey) return rawTranscript;
+      const groqKey = document.getElementById("groq-key").value.trim();
       try {
-        return await generateWithGemini(systemMsg, userMsg, geminiKey);
+        if (groqKey) return await generateWithGroq(systemMsg, userMsg, groqKey);
+        if (geminiKey) return await generateWithGemini(systemMsg, userMsg, geminiKey);
       } catch (e) { return rawTranscript; }
+      return rawTranscript;
     }
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -2000,13 +2044,15 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
   async function checkTranscriptClarity(transcript, anthropicKey) {
     const systemMsg = "Read this transcript. Assess whether it contains enough context to generate platform-specific social captions. Specifically check: (1) Is the core topic or message clear? (2) Is there a specific insight, story, or claim? (3) Is there enough substance for a LinkedIn caption of 900+ characters? If ALL THREE are yes, respond with exactly: CLEAR. If any are unclear, respond with exactly: UNCLEAR: [one sentence explaining what's missing]. Nothing else.";
 
-    // Use Gemini if no Anthropic key
+    // Use selected model's fallback if no Anthropic key
     if (!anthropicKey) {
       const geminiKey = document.getElementById("gemini-key").value.trim();
-      if (!geminiKey) return "CLEAR";
+      const groqKey = document.getElementById("groq-key").value.trim();
       try {
-        return await generateWithGemini(systemMsg, transcript, geminiKey);
+        if (groqKey) return await generateWithGroq(systemMsg, transcript, groqKey);
+        if (geminiKey) return await generateWithGemini(systemMsg, transcript, geminiKey);
       } catch (e) { return "CLEAR"; }
+      return "CLEAR";
     }
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -2238,7 +2284,8 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
   function checkGenerateReady() {
     const anthropicKey = document.getElementById("anthropic-key").value.trim();
     const geminiKey = document.getElementById("gemini-key").value.trim();
-    const hasKey = state.model === "gemini" ? geminiKey.length > 5 : anthropicKey.length > 10;
+    const groqKey = document.getElementById("groq-key").value.trim();
+    const hasKey = state.model === "gemini" ? geminiKey.length > 5 : state.model === "groq" ? groqKey.length > 5 : anthropicKey.length > 10;
     const hasBrand = !!state.brand;
     const hasContent = state.inputMode === "transcript"
       ? document.getElementById("transcript-input").value.trim().length > 20
@@ -2292,17 +2339,19 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     const anthropicKey = document.getElementById("anthropic-key").value.trim();
     const openaiKey = document.getElementById("openai-key").value.trim();
     const geminiKey = document.getElementById("gemini-key").value.trim();
+    const groqKey = document.getElementById("groq-key").value.trim();
 
     // Key validation based on selected model
     if (state.model === "claude" && !anthropicKey) { alert("Please enter your Anthropic API key."); return; }
     if (state.model === "gemini" && !geminiKey) { alert("Add your Google API key to use Gemini."); return; }
+    if (state.model === "groq" && !groqKey) { alert("Add your Groq API key. Get one free at groq.com"); return; }
     // Anthropic key is always needed for clarity check and transcript cleaning
     if (!anthropicKey && state.model !== "claude") {
       // Still need it for clarity check — but we can skip if missing
     }
     if (!state.brand) { alert("Please select a brand."); return; }
 
-    const apiKeys = { anthropic: anthropicKey, openai: openaiKey, gemini: geminiKey };
+    const apiKeys = { anthropic: anthropicKey, openai: openaiKey, gemini: geminiKey, groq: groqKey };
 
     state.isGenerating = true;
     state.results = [];
@@ -2442,6 +2491,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
 
   function getModelLabel() {
     if (state.model === "gemini") return "Gemini";
+    if (state.model === "groq") return "Groq";
     return "Claude";
   }
 
@@ -2514,7 +2564,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
   }
 
   // ── LOCAL STORAGE FOR API KEYS ──
-  const KEY_IDS = ["gemini-key", "anthropic-key", "openai-key"];
+  const KEY_IDS = ["gemini-key", "anthropic-key", "openai-key", "groq-key"];
 
   // Load saved keys on startup
   KEY_IDS.forEach(id => {
@@ -2550,6 +2600,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
   // ── EVENT LISTENERS ──
   document.getElementById("anthropic-key").addEventListener("input", checkGenerateReady);
   document.getElementById("gemini-key").addEventListener("input", checkGenerateReady);
+  document.getElementById("groq-key").addEventListener("input", checkGenerateReady);
   document.getElementById("transcript-input").addEventListener("input", () => {
     state.transcript = document.getElementById("transcript-input").value;
     updateSteps();

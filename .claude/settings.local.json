@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(start \"\" \"c:\\\\SwipeHealth\\\\swipehealth-caption-system\\\\index.html\")",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "WebSearch"
     ]
   }
 }
