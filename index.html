@@ -809,21 +809,135 @@
       .platform-row:last-child { border-bottom: none; }
       .platform-row:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
     }
+
+    /* ── AUTH OVERLAY ── */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: #F8FAFC;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-overlay.hidden { display: none; }
+
+    .auth-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .auth-card .logo-dot {
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+      border-radius: 12px;
+      margin: 0 auto 16px;
+    }
+
+    .auth-card h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .auth-card p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .auth-card .auth-error {
+      color: var(--error);
+      font-size: 13px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .auth-card .auth-error.visible { display: block; }
+
+    #g_id_signin {
+      display: flex;
+      justify-content: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+    }
+
+    .user-email {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sign-out-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sign-out-btn:hover {
+      border-color: var(--error);
+      color: var(--error);
+    }
   </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <div class="logo-dot">S</div>
+    <h1>SwipeHealth Caption System</h1>
+    <p>Sign in with your @swipehealth.ai Google account to continue.</p>
+    <div id="g_id_signin"></div>
+    <div class="auth-error" id="auth-error">Access denied. Only @swipehealth.ai accounts are allowed.</div>
+  </div>
+</div>
+
 <!-- HEADER -->
-<header class="header">
+<header class="header" style="display:none;" id="app-header">
   <div class="logo">
     <div class="logo-dot">S</div>
     SwipeHealth Caption System
   </div>
-  <span class="header-badge">v1.0 — Beta</span>
+  <div class="user-info">
+    <img class="user-avatar" id="user-avatar" src="" alt="" />
+    <span class="user-email" id="user-email"></span>
+    <button class="sign-out-btn" onclick="signOut()">Sign out</button>
+  </div>
 </header>
 
 <!-- MAIN -->
-<main class="main">
+<main class="main" style="display:none;" id="app-main">
 
   <!-- STEPS -->
   <div class="steps" id="steps-indicator">
@@ -1083,6 +1197,97 @@ Example: 'So I've been thinking about this a lot lately. Most people who wear a 
   </div>
 
 </main>
+
+<script>
+  // ── AUTH ──
+  const GOOGLE_CLIENT_ID = "1034813207151-2pa2rfj7d5e66runa9gc13f7pria4ude.apps.googleusercontent.com";
+  const ALLOWED_DOMAIN = "swipehealth.ai";
+
+  function decodeJwtPayload(token) {
+    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(base64));
+  }
+
+  function showApp(user) {
+    document.getElementById("auth-overlay").classList.add("hidden");
+    document.getElementById("app-header").style.display = "";
+    document.getElementById("app-main").style.display = "";
+    document.getElementById("user-email").textContent = user.email;
+    if (user.picture) {
+      document.getElementById("user-avatar").src = user.picture;
+    } else {
+      document.getElementById("user-avatar").style.display = "none";
+    }
+  }
+
+  function handleCredentialResponse(response) {
+    const payload = decodeJwtPayload(response.credential);
+    const email = payload.email || "";
+    const domain = email.split("@")[1];
+
+    if (domain !== ALLOWED_DOMAIN) {
+      document.getElementById("auth-error").classList.add("visible");
+      return;
+    }
+
+    document.getElementById("auth-error").classList.remove("visible");
+    sessionStorage.setItem("sh_auth_token", response.credential);
+    showApp({ email: email, picture: payload.picture });
+  }
+
+  function signOut() {
+    sessionStorage.removeItem("sh_auth_token");
+    google.accounts.id.disableAutoSelect();
+    location.reload();
+  }
+
+  function initAuth() {
+    // Check for existing session
+    const saved = sessionStorage.getItem("sh_auth_token");
+    if (saved) {
+      try {
+        const payload = decodeJwtPayload(saved);
+        const domain = (payload.email || "").split("@")[1];
+        // Check token expiry
+        if (domain === ALLOWED_DOMAIN && payload.exp * 1000 > Date.now()) {
+          showApp({ email: payload.email, picture: payload.picture });
+          return;
+        }
+      } catch (e) { /* invalid token, fall through to login */ }
+      sessionStorage.removeItem("sh_auth_token");
+    }
+
+    // Render Google Sign-In button
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse,
+      auto_select: true,
+      hosted_domain: ALLOWED_DOMAIN
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("g_id_signin"),
+      { theme: "outline", size: "large", width: 300, text: "signin_with", shape: "rectangular" }
+    );
+
+    google.accounts.id.prompt();
+  }
+
+  // Wait for GIS library to load
+  window.addEventListener("load", function() {
+    if (typeof google !== "undefined" && google.accounts) {
+      initAuth();
+    } else {
+      // Retry if the script hasn't loaded yet
+      const check = setInterval(() => {
+        if (typeof google !== "undefined" && google.accounts) {
+          clearInterval(check);
+          initAuth();
+        }
+      }, 200);
+    }
+  });
+</script>
 
 <script type="module">
   // ── STATE ──
