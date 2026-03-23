@@ -993,10 +993,10 @@
       <div class="key-field">
         <label>Google API Key (Gemini)</label>
         <div class="key-input-wrap">
-          <input type="password" class="key-input" id="gemini-key" value="AIzaSyAkYYamSz8QJIM9eEmeSyJlG_oPqendwU4" autocomplete="off" />
+          <input type="password" class="key-input" id="gemini-key" placeholder="Paste your Gemini API key here" autocomplete="off" />
           <button class="key-toggle" onclick="toggleKeyVisibility('gemini-key', this)">👁</button>
         </div>
-        <div class="key-status" id="gemini-key-status" style="color:var(--success);">Default key loaded</div>
+        <div class="key-status" id="gemini-key-status">Enter your API key above</div>
       </div>
     </div>
     <div style="margin-top:12px;">
@@ -2513,6 +2513,40 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
       .replace(/\n/g, "<br>");
   }
 
+  // ── LOCAL STORAGE FOR API KEYS ──
+  const KEY_IDS = ["gemini-key", "anthropic-key", "openai-key"];
+
+  // Load saved keys on startup
+  KEY_IDS.forEach(id => {
+    const saved = localStorage.getItem(id);
+    if (saved) {
+      const input = document.getElementById(id);
+      input.value = saved;
+      const statusEl = document.getElementById(id + "-status");
+      if (statusEl) {
+        statusEl.textContent = "Key loaded from browser storage";
+        statusEl.style.color = "var(--success)";
+      }
+    }
+  });
+
+  // Save keys to localStorage on change
+  KEY_IDS.forEach(id => {
+    document.getElementById(id).addEventListener("change", function() {
+      const val = this.value.trim();
+      if (val) {
+        localStorage.setItem(id, val);
+        const statusEl = document.getElementById(id + "-status");
+        if (statusEl) {
+          statusEl.textContent = "Key saved to browser storage";
+          statusEl.style.color = "var(--success)";
+        }
+      } else {
+        localStorage.removeItem(id);
+      }
+    });
+  });
+
   // ── EVENT LISTENERS ──
   document.getElementById("anthropic-key").addEventListener("input", checkGenerateReady);
   document.getElementById("gemini-key").addEventListener("input", checkGenerateReady);
@@ -2530,6 +2564,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
 
   // Initialize caption count on load
   updateCaptionCount();
+  checkGenerateReady();
 </script>
 
 </body>
