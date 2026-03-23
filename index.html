@@ -1899,7 +1899,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     return generateWithClaude(systemPrompt, userPrompt, apiKeys.anthropic);
   }
 
-  async function generateWithClaude(systemPrompt, userPrompt, anthropicKey) {
+  async function generateWithClaude(systemPrompt, userPrompt, anthropicKey, retries = 3) {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -1918,14 +1918,21 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Claude error ${response.status}`);
+      const msg = err.error?.message || `Claude error ${response.status}`;
+      if (response.status === 429 && retries > 0) {
+        const waitMatch = msg.match(/try again in ([\d.]+)s/i);
+        const waitSec = waitMatch ? parseFloat(waitMatch[1]) + 0.5 : 3;
+        await new Promise(r => setTimeout(r, waitSec * 1000));
+        return generateWithClaude(systemPrompt, userPrompt, anthropicKey, retries - 1);
+      }
+      throw new Error(msg);
     }
 
     const data = await response.json();
     return data.content.filter(b => b.type === "text").map(b => b.text).join("\n").trim();
   }
 
-  async function generateWithGemini(systemPrompt, userPrompt, geminiKey) {
+  async function generateWithGemini(systemPrompt, userPrompt, geminiKey, retries = 3) {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
       {
@@ -1941,7 +1948,14 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || err.error?.status || `Gemini error ${response.status}`);
+      const msg = err.error?.message || err.error?.status || `Gemini error ${response.status}`;
+      if (response.status === 429 && retries > 0) {
+        const waitMatch = msg.match(/try again in ([\d.]+)s/i);
+        const waitSec = waitMatch ? parseFloat(waitMatch[1]) + 0.5 : 5;
+        await new Promise(r => setTimeout(r, waitSec * 1000));
+        return generateWithGemini(systemPrompt, userPrompt, geminiKey, retries - 1);
+      }
+      throw new Error(msg);
     }
 
     const data = await response.json();
@@ -1954,7 +1968,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     return data.candidates[0].content.parts[0].text.trim();
   }
 
-  async function generateWithGroq(systemPrompt, userPrompt, groqKey) {
+  async function generateWithGroq(systemPrompt, userPrompt, groqKey, retries = 3) {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -1974,7 +1988,15 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Groq error ${response.status}`);
+      const msg = err.error?.message || `Groq error ${response.status}`;
+      // Auto-retry on rate limit
+      if (response.status === 429 && retries > 0) {
+        const waitMatch = msg.match(/try again in ([\d.]+)s/i);
+        const waitSec = waitMatch ? parseFloat(waitMatch[1]) + 0.5 : 3;
+        await new Promise(r => setTimeout(r, waitSec * 1000));
+        return generateWithGroq(systemPrompt, userPrompt, groqKey, retries - 1);
+      }
+      throw new Error(msg);
     }
 
     const data = await response.json();
@@ -2421,31 +2443,31 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     document.getElementById("results-section").style.display = "block";
     renderSkeletons(platforms);
 
-    updateProgressUI(0, platforms.length, `Generating ${platforms.length} captions in parallel...`);
+    updateProgressUI(0, platforms.length, `Generating ${platforms.length} captions...`);
 
-    const promises = platforms.map(platform =>
-      generateSingleCaption(state.brand, platform, transcript, apiKeys)
-        .then(caption => {
-          completed++;
-          updateProgressUI(completed, platforms.length, `Generated ${completed} of ${platforms.length} captions...`);
-          document.getElementById("generate-btn").textContent = `⏳ Generating ${completed} of ${platforms.length}...`;
-          const result = { platformId: platform.id, displayName: platform.displayName, caption, error: null };
-          state.results.push(result);
-          updateCaptionCard(result);
-          return result;
-        })
-        .catch(err => {
-          completed++;
-          updateProgressUI(completed, platforms.length, `Generated ${completed} of ${platforms.length} captions...`);
-          document.getElementById("generate-btn").textContent = `⏳ Generating ${completed} of ${platforms.length}...`;
-          const result = { platformId: platform.id, displayName: platform.displayName, caption: "", error: err.message };
-          state.results.push(result);
-          updateCaptionCard(result);
-          return result;
-        })
-    );
+    async function processPlatform(platform) {
+      try {
+        const caption = await generateSingleCaption(state.brand, platform, transcript, apiKeys);
+        completed++;
+        updateProgressUI(completed, platforms.length, `Generated ${completed} of ${platforms.length} captions...`);
+        document.getElementById("generate-btn").textContent = `⏳ Generating ${completed} of ${platforms.length}...`;
+        const result = { platformId: platform.id, displayName: platform.displayName, caption, error: null };
+        state.results.push(result);
+        updateCaptionCard(result);
+      } catch (err) {
+        completed++;
+        updateProgressUI(completed, platforms.length, `Generated ${completed} of ${platforms.length} captions...`);
+        document.getElementById("generate-btn").textContent = `⏳ Generating ${completed} of ${platforms.length}...`;
+        const result = { platformId: platform.id, displayName: platform.displayName, caption: "", error: err.message };
+        state.results.push(result);
+        updateCaptionCard(result);
+      }
+    }
 
-    await Promise.all(promises);
+    // Sequential generation — avoids rate limits on free tiers (Gemini, Groq)
+    for (const platform of platforms) {
+      await processPlatform(platform);
+    }
 
     // Done
     updateProgressUI(platforms.length, platforms.length, `✅ All ${platforms.length} captions ready!`);
