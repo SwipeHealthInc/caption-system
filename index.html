@@ -1011,6 +1011,7 @@
       <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Generation Model</label>
       <div class="model-selector" id="model-selector">
         <button class="model-tab" data-model="claude" onclick="selectModel('claude')">Claude Sonnet 4</button>
+        <button class="model-tab" data-model="haiku" onclick="selectModel('haiku')">Claude Haiku 4.5</button>
         <button class="model-tab active" data-model="gemini" onclick="selectModel('gemini')">Gemini 2.0 Flash</button>
         <button class="model-tab" data-model="groq" onclick="selectModel('groq')">Groq Llama 3.3 70B</button>
       </div>
@@ -1895,11 +1896,14 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     if (state.model === "groq") {
       return generateWithGroq(systemPrompt, userPrompt, apiKeys.groq);
     }
-    // Default: Claude
+    if (state.model === "haiku") {
+      return generateWithClaude(systemPrompt, userPrompt, apiKeys.anthropic, 3, "claude-haiku-4-5-20251001");
+    }
+    // Default: Claude Sonnet
     return generateWithClaude(systemPrompt, userPrompt, apiKeys.anthropic);
   }
 
-  async function generateWithClaude(systemPrompt, userPrompt, anthropicKey, retries = 3) {
+  async function generateWithClaude(systemPrompt, userPrompt, anthropicKey, retries = 3, modelId = "claude-sonnet-4-20250514") {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -1909,7 +1913,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
         "x-api-key": anthropicKey
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: modelId,
         max_tokens: 1000,
         system: systemPrompt,
         messages: [{ role: "user", content: userPrompt }]
@@ -1923,7 +1927,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
         const waitMatch = msg.match(/try again in ([\d.]+)s/i);
         const waitSec = waitMatch ? parseFloat(waitMatch[1]) + 0.5 : 3;
         await new Promise(r => setTimeout(r, waitSec * 1000));
-        return generateWithClaude(systemPrompt, userPrompt, anthropicKey, retries - 1);
+        return generateWithClaude(systemPrompt, userPrompt, anthropicKey, retries - 1, modelId);
       }
       throw new Error(msg);
     }
@@ -2307,7 +2311,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
     const anthropicKey = document.getElementById("anthropic-key").value.trim();
     const geminiKey = document.getElementById("gemini-key").value.trim();
     const groqKey = document.getElementById("groq-key").value.trim();
-    const hasKey = state.model === "gemini" ? geminiKey.length > 5 : state.model === "groq" ? groqKey.length > 5 : anthropicKey.length > 10;
+    const hasKey = state.model === "gemini" ? geminiKey.length > 5 : state.model === "groq" ? groqKey.length > 5 : (state.model === "claude" || state.model === "haiku") ? anthropicKey.length > 10 : anthropicKey.length > 10;
     const hasBrand = !!state.brand;
     const hasContent = state.inputMode === "transcript"
       ? document.getElementById("transcript-input").value.trim().length > 20
@@ -2365,6 +2369,7 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
 
     // Key validation based on selected model
     if (state.model === "claude" && !anthropicKey) { alert("Please enter your Anthropic API key."); return; }
+    if (state.model === "haiku" && !anthropicKey) { alert("Please enter your Anthropic API key."); return; }
     if (state.model === "gemini" && !geminiKey) { alert("Add your Google API key to use Gemini."); return; }
     if (state.model === "groq" && !groqKey) { alert("Add your Groq API key. Get one free at groq.com"); return; }
     // Anthropic key is always needed for clarity check and transcript cleaning
@@ -2514,7 +2519,8 @@ YOUR TASK: You will receive a video transcript or script. Extract the core insig
   function getModelLabel() {
     if (state.model === "gemini") return "Gemini";
     if (state.model === "groq") return "Groq";
-    return "Claude";
+    if (state.model === "haiku") return "Claude Haiku";
+    return "Claude Sonnet";
   }
 
   function updateCaptionCard(result) {
