@@ -1,8 +1,52 @@
 # CAPTION PLAYBOOK — PLATFORM ADDENDUM
 ## Multi-Platform Viral Caption Intelligence
 ## Built from: 30 viral posts across TikTok, Instagram, X, YouTube Shorts, Threads, Facebook
-## Version: 1.0 — March 2026
+## Version: 1.1 — March 2026 (updated with caption system rules + expanded corpus findings)
 ## Companion to: caption_playbook.md (LinkedIn intelligence)
+
+---
+
+# CAPTION SYSTEM RULES — APPLY TO ALL PLATFORMS
+
+These 4 guardrails override everything else. Apply on every platform, for both brands, on every caption.
+
+**RULE 1: First-Person POV**
+SwipeHealth brand captions: NEVER use "I", "Me", "My" as first-person subjects. SwipeHealth speaks as a product/brand — second-person ("you", "your") or declarative statements. If a caption cannot work without first-person, regenerate it entirely.
+Jake personal brand captions: First-person IS correct and expected. His story, his voice.
+Test: if the account posting is @SwipeHealth → no first-person. If it's Jake personally → first-person is right.
+
+**RULE 2: X / Threads Sentence Casing**
+All X and Threads captions: sentences start UPPERCASE — standard capitalization throughout. Applies to both Jake and SwipeHealth on both platforms. Tone is achieved through word choice, NOT lowercase casing.
+Correct: "Honestly, your fitness app does not know anything about your actual life."
+Wrong: "honestly, your fitness app doesn't know anything about your actual life"
+
+**RULE 3: YouTube Caption Length Split**
+SwipeHealth brand: SHORT — under 100 characters before hashtags. 1-2 sentences max.
+Jake personal: LONGER — 2-4 sentences fine. Include "Subscribe for more" CTA (platform-native).
+Never apply the long format to SwipeHealth. Never apply the short format to Jake when the story needs more.
+
+**RULE 4: Instagram Caption Length — Both Brands**
+Both Jake and SwipeHealth on Instagram: SHORT — 1-2 sentences max before hashtags. Hard cap: 150 characters before hashtags. Brevity > Length. Always.
+
+---
+
+# CROSS-PLATFORM FINDINGS — KEY INSIGHTS
+
+**The 5 patterns that work everywhere:**
+1. Specificity beats vagueness on every platform. "Lost 21 pounds" beats "great results." "68% abandon rate" beats "most people quit."
+2. The strongest hooks are either counterintuitive OR the answer to a question people are actively searching.
+3. Community identity beats product features everywhere. People want to belong to something, not buy something. #SwipeHealthChallenge is a tribe, not a hashtag.
+4. Definitive verdicts outperform hedged opinions. State the verdict. Let the comments debate.
+5. Match the platform's native casualness. Threads = casual words, uppercase sentences. LinkedIn = professional-human. TikTok = text to a friend.
+
+**The unoccupied lane SwipeHealth owns:**
+Nobody in fitness/wearables consistently speaks to the person with 20 minutes, a full-time job, and kids. Not training for a competition. Doesn't want to be shamed. Just wants to be consistent. This positioning is uncontested on every platform. Every content strategy should reinforce it.
+
+**Core credibility anchor (use everywhere):**
+68% of wearable owners abandon their companion app within 6 months. Not laziness. Design failure. This stat is the foundation of SwipeHealth's entire argument.
+
+**Price anchor (use when relevant):**
+$22.99/month vs $100-200/session for a personal trainer. Specific comparison, no hedging.
 
 ---
 

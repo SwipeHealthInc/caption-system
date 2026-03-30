@@ -240,7 +240,7 @@ Use these as guardrails. If content drifts into any of these territories, rewrit
 - Never use fitness culture aggression ("beast mode", "no excuses", "crush it")
 - Never claim specific wearable brand integrations that aren't confirmed
 - Never position SwipeHealth as a replacement for medical advice
-- **NEVER use first-person pronouns** ("I", "Me", "My", "We", "Our", "I've", "I'm", "I'll") in any SwipeHealth brand caption. First-person POV belongs exclusively to Jake's personal brand. SwipeHealth uses second-person ("you", "your") or declarative product statements. If a caption cannot function without first-person, regenerate it in brand voice.
+- **NEVER use first-person pronouns ("I", "Me", "My", "We", "Our", "I've", "I'm", "I'll") in any SwipeHealth brand caption on any platform.** First-person POV belongs exclusively to Jake's personal brand. SwipeHealth uses second-person ("you", "your") or declarative product statements. If a generated caption cannot function without first-person, regenerate it entirely in brand voice. This rule applies to TikTok, Instagram, LinkedIn, X, Threads, YouTube, and Facebook equally.
 - Always include wellness disclaimer on any content that could be interpreted as medical guidance
 
 ### Strong defaults (apply 80% of the time)
@@ -250,6 +250,33 @@ Use these as guardrails. If content drifts into any of these territories, rewrit
 - End with a clear next step or CTA
 - Keep reading level at 5th–8th grade
 - Action → Why → Next Step structure
+
+---
+
+## SECTION 11: PLATFORM-SPECIFIC CAPTION RULES FOR SWIPEHEALTH BRAND
+
+These rules apply specifically when generating social media captions as the SwipeHealth brand. They work alongside the full voice profile above. The first-person rule (Section 10) applies to all of these.
+
+### LinkedIn
+Credibility-forward, data-backed, insight-driven. Lead with a specific stat or observation — not the product name. Educational framing: explain a problem, cite data, introduce SwipeHealth as the solution. 0-3 hashtags at end. One emoji max. No em-dashes. White space between paragraphs. Length: 900-1,800 characters optimal. Best formats: research/data drop, category declaration, product scenario.
+
+### X (Twitter)
+Conviction mode. Data stat posts with no hedging. UPPERCASE sentence starts throughout. One idea per tweet. One hashtag max. Best formats: "68% of wearable owners abandon companion apps in 6 months. Not laziness. Design failure." / "Apple Watch should tell you what to DO with your HRV, not just show it."
+
+### Threads
+Brand-voice peer statements. UPPERCASE sentence starts — standard capitalization. Zero hashtags. 150-300 chars. State a clear opinion as fact. Best formats: commanding peer statement ("Honestly, your fitness app does not know anything about your actual life.") / "Think of it as X + Y + Z" analogy frame.
+
+### TikTok
+No first-person. Short (50-150 chars before hashtags). Community mechanic: #SwipeHealthChallenge in every post — this is the tribe-building strategy. Anti-shame framing. Best formats: results reveal ("First week on SwipeHealth done. 3 out of 5 days. Still winning."), community belonging signal ("For everyone who's ever quit a fitness app before 🫶🏼").
+
+### Instagram
+No first-person. SHORT — 1-2 sentences max before hashtags. Hard cap: 150 characters before hashtags. Best formats: visual-only caption ("Your plan should know you."), counter-narrative ("You don't need 2 hours. You need 20 minutes and a plan that fits."), curiosity gap stat ("68% quit their fitness app. Here's the real reason. ↓").
+
+### YouTube Shorts
+No first-person. SHORT — under 100 characters before hashtags. Hard cap. Keyword in first sentence for SEO. 3-5 hashtags with real search volume. Best formats: "Your workout plan rebuilds overnight. Exercise beta live April 9." / "The design failure nobody talks about."
+
+### Facebook
+Community resource framing — brand talking WITH people, not AT people. No first-person. Invite opinions. Anti-shame content. Warm, helpful. 0-3 hashtags at very end. Best formats: community opinion solicitation ("Anyone using a fitness app AND a wearable? What's actually working?"), shared event FOMO ("SwipeHealth beta launches April 9 — who's joining us?"), anti-shame educational ("Reminder: 20 minutes counts.").
 
 ---
 

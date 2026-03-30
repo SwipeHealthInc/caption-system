@@ -1,7 +1,31 @@
 # CAPTION PLAYBOOK
 ## SwipeHealth Caption Intelligence System
 ## Built from: 46 viral LinkedIn posts — wearables/fitness niche + general tech
-## Version: 1.0 — March 2026
+## Version: 1.1 — March 2026
+
+---
+
+# CAPTION SYSTEM RULES — APPLY TO ALL PLATFORMS
+
+These 4 guardrails override everything else. Apply on every platform, for both brands, on every caption.
+
+**RULE 1: First-Person POV**
+SwipeHealth brand captions: NEVER use "I", "Me", "My" as first-person subjects. SwipeHealth speaks as a product/brand — second-person ("you", "your") or declarative statements. If a caption cannot work without first-person, regenerate it entirely.
+Jake personal brand captions: First-person IS correct and expected. His story, his voice.
+Test: if the account posting is @SwipeHealth → no first-person. If it's Jake personally → first-person is right.
+
+**RULE 2: X / Threads Sentence Casing**
+All X and Threads captions: sentences start UPPERCASE — standard capitalization throughout. Applies to both Jake and SwipeHealth on both platforms. Tone is achieved through word choice, NOT lowercase casing.
+Correct: "Honestly, your fitness app does not know anything about your actual life."
+Wrong: "honestly, your fitness app doesn't know anything about your actual life"
+
+**RULE 3: YouTube Caption Length Split**
+SwipeHealth brand: SHORT — under 100 characters before hashtags. 1-2 sentences max.
+Jake personal: LONGER — 2-4 sentences fine. Include "Subscribe for more" CTA (platform-native).
+Never apply the long format to SwipeHealth. Never apply the short format to Jake when the story needs more.
+
+**RULE 4: Instagram Caption Length — Both Brands**
+Both Jake and SwipeHealth on Instagram: SHORT — 1-2 sentences max before hashtags. Hard cap: 150 characters before hashtags. Brevity > Length. Always.
 
 ---
 

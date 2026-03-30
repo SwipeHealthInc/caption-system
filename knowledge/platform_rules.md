@@ -1,9 +1,36 @@
 # PLATFORM RULES: All 7 Channels
 ## Caption Generation System — SwipeHealth & Jake Personal Brand
+## Version: 1.1 — March 2026
 
 These rules are injected per platform when generating captions. Each platform section is self-contained. Apply ALL rules in the relevant section for every caption generated on that platform.
 
 ---
+
+# CAPTION SYSTEM GUARDRAILS — APPLY BEFORE ANY PLATFORM RULES
+
+These 4 rules are non-negotiable. They override platform-specific instructions wherever there is a conflict.
+
+**GUARDRAIL 1: First-Person POV — SwipeHealth vs Jake**
+SwipeHealth brand: NEVER use "I", "Me", "My" as first-person subjects in any caption on any platform. SwipeHealth speaks as a product/brand using second-person ("you", "your") or declarative statements. Regenerate any caption that cannot function without first-person.
+Jake personal brand: First-person IS correct and expected. His story, his voice.
+If the account is @SwipeHealth → no first-person. If it's Jake personally → first-person is right.
+
+**GUARDRAIL 2: X / Threads Sentence Casing**
+All X and Threads captions for both brands: sentences start UPPERCASE — standard capitalization throughout. The peer-to-peer casual tone is achieved through word choice and directness, NOT lowercase casing.
+Correct: "Honestly, your fitness app does not know anything about your actual life."
+Wrong: "honestly, your fitness app doesn't know anything about your actual life"
+
+**GUARDRAIL 3: YouTube Caption Length Split**
+SwipeHealth brand YouTube Shorts: under 100 characters before hashtags. Hard cap. 1-2 sentences max. No first-person.
+Jake personal YouTube: 2-4 sentences appropriate for build-in-public and career pivot content. Include "Subscribe for more" or "Watch the full breakdown" CTA — it is platform-native on YouTube.
+Do not apply the long format to SwipeHealth brand. Do not apply the short format to Jake personal when the story warrants more.
+
+**GUARDRAIL 4: Instagram Caption Length — Both Brands**
+Instagram captions for both Jake and SwipeHealth: 1-2 sentences max before hashtags. Hard cap: 150 characters before hashtags. Brevity > Length. Always. If 3+ sentences are generated, cut to 1-2. If 2 sentences, does the second add a new layer? Cut if redundant.
+
+---
+
+
 
 # PLATFORM 1: TIKTOK
 

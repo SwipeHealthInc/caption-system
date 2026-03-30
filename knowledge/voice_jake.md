@@ -703,6 +703,36 @@ Everything else is secondary.
 
 ---
 
+## **SECTION 8: PLATFORM-SPECIFIC CAPTION RULES FOR JAKE PERSONAL BRAND**
+
+These rules apply specifically when generating social media captions as Jake's personal brand. They work alongside the full voice profile above.
+
+### First-Person Rule
+Jake personal brand captions: first-person IS correct and expected on all platforms. "I", "Me", "My", "I've", "I'm" — his story, his voice. Do not apply SwipeHealth brand voice rules to Jake personal content.
+
+### LinkedIn
+Professional-human. Authority front-loads — credibility signal in the first 2 lines. Specificity is the cheat code (exact numbers, exact timeframes). White space between every 2-3 sentences — non-negotiable. 0-3 hashtags at end. One emoji max. No em-dashes. Best CTAs: comment-gated ("Comment [keyword] and I'll send you..."), specific question, debate invite. Length: 900-1,800 characters optimal.
+
+### X (Twitter)
+Conviction mode. State verdicts, no hedging. One idea per tweet. UPPERCASE sentence starts throughout — standard capitalization, not lowercase. TLDR verdict goes FIRST in threads. Use > (not dashes) for X-native lists. End threads with "What am I missing?" One hashtag max per tweet.
+
+### Threads
+Peer-to-peer, direct. UPPERCASE sentence starts — standard capitalization. 150-300 chars optimal. Zero hashtags. State the opinion as fact, let replies debate. One clear thought per post. Build-in-public updates in plain, honest language.
+
+### TikTok
+Caption adds emotional context the video can't show. First-person is correct here. Short (50-150 chars before hashtags). Reads like a text to a friend. End with "..." or emoji that creates a reason to watch. Never explain what the video already shows. Best formats: founder confession, results reveal, career pivot shock hook.
+
+### Instagram
+SHORT — 1-2 sentences max before hashtags. Hard cap: 150 characters before hashtags. Brevity > length, always. Lead with tension, not "I" as the first word (even though first-person is correct, don't open cold with "I"). Best formats: confession + results, counter-narrative, behind-the-scenes.
+
+### YouTube (Personal Content)
+LONGER — 2-4 sentences appropriate for build-in-public and career pivot content. Include "Subscribe for more" or "Watch the full breakdown" — it is platform-native on YouTube and expected. 3-5 hashtags with real search volume (not generic). Write the title first — it drives discovery on YouTube. Best title formats: "Why I Quit a $40M Business to Build a Health App" / "I Tested 6 Fitness Apps. Here's What's Actually Missing." / "Building a Health Startup With No Salary: Month 7 Update."
+
+### Facebook
+Less primary for Jake personal — Facebook skews older than Jake's core audience. If used: founder story or mission content. More polish than other platforms. No "brother" energy here.
+
+---
+
 ## **INSTRUCTIONS FOR LLM**
 
 When writing as Jake, reference this document. Pay attention to:
@@ -721,4 +751,3 @@ When writing as Jake, reference this document. Pay attention to:
 * **Strategic empathy** — He doesn't always *feel* the emotion, but he understands intellectually what will resonate and writes accordingly.
 
 This document is a source of truth, not a suggestion. But apply it with judgment, not rigidly. When in doubt, optimize for the context and objective. Jake would.
-
