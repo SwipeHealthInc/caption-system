@@ -160,9 +160,10 @@ Instagram is a visual-first platform. The caption supports the visual — it doe
 
 ## Character Limit
 - Hard limit: 2,200 characters
-- Feed posts (optimal): 150–300 characters OR 800–1,200 for value-dense carousel posts
-- Reels (optimal): 100–150 characters (same logic as TikTok)
-- Rule: Match length to content type. Don't write a novel under a Reel.
+- Target: 1–2 sentences before hashtags. Hard cap: 150 characters before hashtags (both Jake and SwipeHealth brands)
+- Think of it as Threads-length brevity applied to Instagram. The video/visual does the work. The caption adds ONE emotional layer.
+- Brevity > Length. Always on Instagram.
+- CUT TEST: If 3+ sentences, cut to 1–2. If 2 sentences, does the second add a new layer? Cut if redundant. If 1, usually correct.
 
 ## Hook Rules
 - Instagram shows first 125 characters before "more" on mobile
@@ -397,6 +398,13 @@ Post 2–N: Build on it naturally, as if talking through an idea
 Final post: Conclusion, question, or CTA
 ```
 
+## Casing Rule (Non-Negotiable)
+- Standard sentence capitalization required on Threads
+- Capitalize the first word of every sentence
+- The casual peer-to-peer tone is achieved through WORD CHOICE and directness, not through lowercase styling
+- Correct: "Honestly, your fitness app does not know anything about your actual life."
+- Wrong: "honestly, your fitness app doesn't know anything about your actual life"
+
 ## Tone
 - Most conversational of all platforms
 - Feels like texting a group of people who are interested in what you do
@@ -444,7 +452,8 @@ YouTube Shorts is a discovery platform like TikTok — but with YouTube's search
 
 ## Character Limit
 - Hard limit: 5,000 characters
-- Optimal: 150–300 characters for the visible caption
+- SwipeHealth brand: SHORT — hard cap of 100 characters before hashtags, 1–2 sentences max
+- Jake personal: LONGER — 2–4 sentences, soft cap of 350 characters before hashtags
 - Rule: Write for the viewer first (short and punchy), but include searchable keywords naturally
 
 ## Hook Rules
@@ -535,9 +544,10 @@ YouTube Shorts is a discovery platform like TikTok — but with YouTube's search
 |---|---|---|---|---|---|
 | TikTok | 100–150 chars | 3–5 | 1–3 | Soft, question-based | Casual, punchy |
 | LinkedIn | 900–1,800 chars | 3–5 | 0–2 | Question or share prompt | Professional-human |
-| Instagram Feed | 150–300 chars | 5–10 | 2–5 | Save, tag, question | Visual-emotional |
+| Instagram Feed | 1–2 sentences, 150 char hard cap before hashtags | 5–10 | 2–5 | Save, tag, question | Visual-emotional |
 | Instagram Reels | 100–150 chars | 3–5 | 1–3 | Soft, question-based | Casual, energetic |
 | Facebook | 150–300 words | 0–3 | 1–3 | Community question | Warm, conversational |
 | X (Twitter) | ≤280 chars | 0–1 | 0–2 | Implicit | Sharp, direct |
-| Threads | 150–300 chars | 0 | 1–3 | Natural question | Casual, authentic |
-| YouTube Shorts | 150–300 chars | 3–5 | 1–3 | Subscribe, comment | Educational, clear |
+| Threads | 150–300 chars, sentence casing required | 0 | 1–3 | Natural question | Casual, authentic |
+| YouTube Shorts (SwipeHealth) | 100 char hard cap before hashtags | 3–5 | 1–3 | Subscribe, comment | Educational, clear |
+| YouTube Shorts (Jake) | 2–4 sentences, 350 char soft cap | 3–5 | 1–3 | Subscribe, comment | Personal, educational |

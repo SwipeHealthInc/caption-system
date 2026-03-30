@@ -44,11 +44,14 @@ async function generateSingleCaption(brand, platform, transcript) {
     }
 
     const data = await response.json();
-    const caption = data.content
+    let caption = data.content
       .filter(block => block.type === "text")
       .map(block => block.text)
       .join("\n")
       .trim();
+
+    // Apply post-processing pipeline
+    caption = postProcessCaption(caption, platform);
 
     return {
       platformId: platform.id,
@@ -66,6 +69,69 @@ async function generateSingleCaption(brand, platform, transcript) {
       error: err.message
     };
   }
+}
+
+// ── POST-PROCESSING PIPELINE ──
+
+/**
+ * Capitalizes the first letter of every sentence in a caption
+ * @param {string} caption
+ * @returns {string}
+ */
+function capitalizeSentences(caption) {
+  let result = caption.charAt(0).toUpperCase() + caption.slice(1);
+  result = result.replace(/([.!?]\s+)([a-z])/g, (m, boundary, letter) => boundary + letter.toUpperCase());
+  result = result.replace(/(\n\s*)([a-z])/g, (m, nl, letter) => nl + letter.toUpperCase());
+  return result;
+}
+
+/**
+ * Checks if a caption contains first-person pronouns (excluding hashtag portion)
+ * @param {string} caption
+ * @returns {boolean}
+ */
+function hasPOVFirstPerson(caption) {
+  const bodyBeforeHashtags = caption.replace(/((?:\s*#\w+)+)\s*$/, "");
+  return /\b(I|I'm|I've|I'll|I'd|Me|My|Mine|Myself|We|We're|We've|We'll|We'd|Our|Ours|Ourselves)\b/.test(bodyBeforeHashtags);
+}
+
+/**
+ * Applies all post-processing rules to a generated caption
+ * @param {string} caption - raw generated caption
+ * @param {Object} platform - platform config object
+ * @returns {string} - post-processed caption
+ */
+function postProcessCaption(caption, platform) {
+  let processed = caption;
+
+  // Rule 1: Flag first-person in SwipeHealth brand captions
+  if (platform.brand === "swipehealth" && hasPOVFirstPerson(processed)) {
+    console.warn(`[POV CHECK] First-person pronoun detected in ${platform.id} caption. Review needed.`);
+  }
+
+  // Rule 2: Enforce sentence capitalization on X and Threads
+  const casingPlatforms = ["x_jake", "x_swipehealth", "threads_jake", "threads_swipehealth"];
+  if (casingPlatforms.includes(platform.id)) {
+    processed = capitalizeSentences(processed);
+  }
+
+  // Rule 3: YouTube SwipeHealth length check
+  if (platform.id === "youtube_swipehealth") {
+    const body = processed.replace(/((?:\s*#\w+)+)\s*$/, "").trim();
+    if (body.length > 100) {
+      console.warn(`[LENGTH CHECK] YouTube SwipeHealth caption is ${body.length} chars before hashtags (hard cap: 100).`);
+    }
+  }
+
+  // Rule 4: Instagram length check
+  if (platform.id === "instagram_jake" || platform.id === "instagram_swipehealth") {
+    const body = processed.replace(/((?:\s*#\w+)+)\s*$/, "").trim();
+    if (body.length > 150) {
+      console.warn(`[LENGTH CHECK] Instagram ${platform.id} caption is ${body.length} chars before hashtags (hard cap: 150).`);
+    }
+  }
+
+  return processed;
 }
 
 /**

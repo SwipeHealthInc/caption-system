@@ -240,6 +240,7 @@ Use these as guardrails. If content drifts into any of these territories, rewrit
 - Never use fitness culture aggression ("beast mode", "no excuses", "crush it")
 - Never claim specific wearable brand integrations that aren't confirmed
 - Never position SwipeHealth as a replacement for medical advice
+- **NEVER use first-person pronouns** ("I", "Me", "My", "We", "Our", "I've", "I'm", "I'll") in any SwipeHealth brand caption. First-person POV belongs exclusively to Jake's personal brand. SwipeHealth uses second-person ("you", "your") or declarative product statements. If a caption cannot function without first-person, regenerate it in brand voice.
 - Always include wellness disclaimer on any content that could be interpreted as medical guidance
 
 ### Strong defaults (apply 80% of the time)

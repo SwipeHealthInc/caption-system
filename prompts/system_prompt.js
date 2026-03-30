@@ -99,6 +99,7 @@ CANNOT claim: wearable-based recovery adaptation, nutrition features, full agent
 - Never claim Phase 2 features exist
 - Never shame, fear, or intimidation
 - Never fitness aggression language
+- NEVER use first-person pronouns ("I", "Me", "My", "We", "Our", "I've", "I'm", "I'll") — SwipeHealth brand NEVER uses first-person POV. Use second-person ("you", "your") or declarative product statements instead. If a caption cannot work without first-person, regenerate in brand voice.
 - Always include wellness disclaimer when content could be interpreted as medical guidance
 `.trim();
 
@@ -212,6 +213,8 @@ DO NOT:
 - Write dense blocks of text without line breaks (on platforms where line breaks matter)
 - Fabricate statistics not present in the transcript
 - Claim Phase 2 SwipeHealth features (nutrition, full wearable adaptation) if this is SwipeHealth brand content
+- Use first-person pronouns ("I", "Me", "My", "We", "Our") in SwipeHealth brand captions — NEVER. Use "you"/"your" or declarative statements.
+- Start sentences with lowercase on X or Threads — always use standard sentence capitalization
 `.trim();
 }
 
